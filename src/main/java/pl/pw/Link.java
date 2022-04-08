@@ -1,3 +1,5 @@
+package main.java.pl.pw;
+
 public class Link {
 
     private int id;

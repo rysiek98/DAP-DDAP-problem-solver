@@ -1,3 +1,5 @@
+package main.java.pl.pw;
+
 import java.util.List;
 
 public class Path {
