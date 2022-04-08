@@ -5,13 +5,12 @@ public class Link {
     private int id;
     private Node startNode;
     private Node endNode;
-    private int numberOfModules;
+    private int numberOfFibre;
+    private float cost;
+    private int lambdas;
 
-    public Link(int id, Node startNode, Node endNode, int numberOfModules) {
+    public Link(int id) {
         this.id = id;
-        this.startNode = startNode;
-        this.endNode = endNode;
-        this.numberOfModules = numberOfModules;
     }
 
     public int getId() {
@@ -38,11 +37,27 @@ public class Link {
         this.endNode = endNode;
     }
 
-    public int getNumberOfModules() {
-        return numberOfModules;
+    public int getNumberOfFibre() {
+        return numberOfFibre;
     }
 
-    public void setNumberOfModules(int numberOfModules) {
-        this.numberOfModules = numberOfModules;
+    public void setNumberOfFibre(int numberOfFibre) {
+        this.numberOfFibre = numberOfFibre;
+    }
+
+    public float getCost() {
+        return cost;
+    }
+
+    public int getLambdas() {
+        return lambdas;
+    }
+
+    public void setCost(float cost) {
+        this.cost = cost;
+    }
+
+    public void setLambdas(int lambdas) {
+        this.lambdas = lambdas;
     }
 }
