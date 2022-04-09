@@ -1,5 +1,6 @@
 package main.java.pl.pw;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Demand {
@@ -10,6 +11,11 @@ public class Demand {
     private int demandVolume;
     private List<Path> pathList;
 
+
+    public Demand(int id) {
+        this.id = id;
+        this.pathList = new ArrayList<>();
+    }
 
     public Demand(int id, Node startNode, Node endNode, int demandVolume, List<Path> pathList) {
         this.id = id;
@@ -37,5 +43,26 @@ public class Demand {
 
     public List<Path> getPathList() {
         return pathList;
+    }
+
+    public void setStartNode(Node startNode) {
+        this.startNode = startNode;
+    }
+
+    public void setEndNode(Node endNode) {
+        this.endNode = endNode;
+    }
+
+    public void setDemandVolume(int demandVolume) {
+        this.demandVolume = demandVolume;
+    }
+
+    public void setPathList(List<Path> pathList) {
+        this.pathList = pathList;
+    }
+
+    public void addPath(Path path)
+    {
+        pathList.add(path);
     }
 }

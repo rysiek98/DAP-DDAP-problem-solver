@@ -8,11 +8,13 @@ public class Program {
     public static void main(String args[])
     {
         try {
-            List<String> data = Parser.readDataLinks("src/main/resources/net4.txt");
-            for(int i =0; i < data.size(); i++){
-                System.out.println(data.get(i));
-            }
-            System.out.println(Parser.createLinks(data).size());
+            List<String> data = Parser.readDataDemands("src/main/resources/net4.txt");
+//            for(int i =0; i < data.size(); i++){
+//                System.out.println(data.get(i));
+//            }
+            // System.out.println(Parser.createLinks(data).size());
+            Parser.createDemands(data);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
