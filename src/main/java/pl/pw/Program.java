@@ -5,18 +5,19 @@ import java.util.List;
 
 public class Program {
 
-    public static void main(String args[])
-    {
+    public static void main(String args[]) {
+        List<String> demandsData = null;
+        List<String> linksData = null;
+        List<Link> links = null;
+        List<Demand> demands = null;
         try {
-            List<String> data = Parser.readDataDemands("src/main/resources/net4.txt");
-//            for(int i =0; i < data.size(); i++){
-//                System.out.println(data.get(i));
-//            }
-            // System.out.println(Parser.createLinks(data).size());
-            Parser.createDemands(data);
-
+            linksData = Parser.readDataLinks("src/main/resources/net12_1.txt");
+            demandsData = Parser.readDataDemands("src/main/resources/net12_1.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        links = Parser.createLinks(linksData);
+        demands = Parser.createDemands(demandsData, links);
+        Network network = new Network(links, demands);
     }
 }

@@ -52,9 +52,8 @@ public class Parser {
             while ((line = bufferedReader.readLine()) != null) {
                 if (line.equals("-1")) {
                     demands = true;
-                }
-                else if (demands) {
-                    if (line.trim().length() != 0 )     // skipping empty line
+                } else if (demands) {
+                    if (line.trim().length() != 0)     // skipping empty line
                     {
                         data.add(line);
                     }
@@ -72,20 +71,21 @@ public class Parser {
 
     public static List<Link> createLinks(List<String> data) {
         List<Link> links = new ArrayList<>();
-        int id = 0;
+        int id = 1;
         for (int i = 1; i < data.size(); i += 5) {
             links.add(new Link(id));
-            links.get(id).setStartNode(new Node(Integer.parseInt(data.get(i))));
-            links.get(id).setEndNode(new Node(Integer.parseInt(data.get(i + 1))));
-            links.get(id).setNumberOfFibre(Integer.parseInt(data.get(i + 2)));
-            links.get(id).setCost(Float.parseFloat(data.get(i + 3)));
-            links.get(id).setLambdas(Integer.parseInt(data.get(i + 4)));
+            links.get(id-1).setStartNode(new Node(Integer.parseInt(data.get(i))));
+            links.get(id-1).setEndNode(new Node(Integer.parseInt(data.get(i + 1))));
+            links.get(id-1).setNumberOfFibre(Integer.parseInt(data.get(i + 2)));
+            links.get(id-1).setCost(Float.parseFloat(data.get(i + 3)));
+            links.get(id-1).setLambdas(Integer.parseInt(data.get(i + 4)));
+            System.out.println("Created link ID: "+id+" startNode: "+links.get(id-1).getStartNode().getId()+" endNode: "+links.get(id-1).getEndNode().getId());
             ++id;
         }
         return links;
     }
 
-    public static List<Demand> createDemands(List<String> data){
+    public static List<Demand> createDemands(List<String> data, List<Link> links) {
         List<Demand> demands = new ArrayList<>();
 
         int numberOfDemands = Integer.parseInt(data.get(0));
@@ -93,9 +93,9 @@ public class Parser {
 
         for (int demandId = 0; demandId < numberOfDemands; demandId++) {
 
-            demands.add(new Demand(demandId));
+            demands.add(new Demand(demandId+1));
 
-            System.out.println("Demand id: " + demandId);
+            System.out.println("Demand id: " + demands.get(demandId).getId()+" with paths:");
 
             listIter++; // line with demand details
             String[] demandDetails = data.get(listIter).split(" ");
@@ -108,25 +108,21 @@ public class Parser {
             listIter++;
             int numberOfPaths = Integer.parseInt(data.get(listIter));
 
-
             for (int i = 0; i < numberOfPaths; i++) {
 
                 listIter++;
-                Path path = new Path(i);
-
+                Path path = new Path(i+1);
+                System.out.print("Created path ID: "+path.getId()+" with links:");
                 String[] splittedLine = data.get(listIter).split(" ");
                 String[] pathLinkList = Arrays.copyOfRange(splittedLine, 1, splittedLine.length);
-
                 for (int j = 0; j < pathLinkList.length; j++) {
-                    System.out.print(pathLinkList[j]);
+                    path.addLink(links.get(Integer.parseInt(pathLinkList[j])-1));
+                    System.out.print(" "+links.get(Integer.parseInt(pathLinkList[j])-1).getId());
                 }
                 System.out.println();
-                // TODO add links to the path   path.addLink(link)
-
                 demands.get(demandId).addPath(path);
             }
         }
-
         return demands;
     }
 
