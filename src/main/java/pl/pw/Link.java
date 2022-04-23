@@ -8,6 +8,7 @@ public class Link {
     private int numberOfFibre;
     private float cost;
     private int lambdas;
+    private  int usedLambdas;
 
     public Link(int id) {
         this.id = id;
@@ -60,4 +61,17 @@ public class Link {
     public void setLambdas(int lambdas) {
         this.lambdas = lambdas;
     }
+
+    public int getUsedLambdas() { return usedLambdas; }
+
+    public void setUsedLambdas(int usedLambdas) { this.usedLambdas = usedLambdas; }
+
+    public  void updateUsedLambdas(int usedLambdas) { this.usedLambdas += usedLambdas; }
+
+    public float calculateCost()
+    {
+        float usdeFibrePairs = usedLambdas/lambdas/2;   // TODO nie wiem czy tu dzielić przez 2, bo na slajdach jest fibre pair of cables
+        return usdeFibrePairs * cost;
+    }
+
 }

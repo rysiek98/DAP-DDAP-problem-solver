@@ -9,24 +9,56 @@ import java.util.stream.Collectors;
 public class BruteForceAlgorithm {
 
     protected Network network;
-    private List<Solution> solutions;
+    private List<List<List<Integer>>> solutions;
 
     public BruteForceAlgorithm(Network network) {
         this.network = network;
         solutions = new ArrayList<>();
     }
 
-    public void createAllSolutions() {
+    public void computeDDAP() {
 
-        List<List<List<Integer>>> allCombinations = getAllCombinations();
+        float minCost = Float.MAX_VALUE;
+        List<List<Integer>> bestSolution = new ArrayList<>();
 
-        for(List<List<Integer>> list : allCombinations) {
-            Solution solution = new Solution(list);
-            solutions.add(solution);
+        for(List<List<Integer>> solution : solutions) {
+            float cost = 0;
+            boolean newSolution = true;
+
+            for(int demandId = 1; demandId <= network.getNumberOfDemands(); demandId++) {
+
+                for(Path path : network.getDemandList().get(demandId -1).getPathList()) {
+
+                    for(Link link : path.getLinkList()) {
+
+                        if(newSolution) {
+                            link.setUsedLambdas(0);
+                            newSolution = false;
+                        }
+                        link.updateUsedLambdas(network.getDemandList().get(demandId -1).getDemandVolume());
+                    }
+                }
+            }
+
+            for(Link link : network.getLinkList())
+            {
+                cost += link.calculateCost();
+            }
+
+            if(cost< minCost) {
+                minCost = cost;
+                bestSolution = solution;
+            }
         }
+
+        System.out.println(minCost);
+        System.out.println(bestSolution);
     }
 
-    public List<List<List<Integer>>> getAllCombinations() {
+
+    public void createAllSolutions() {
+
+        /// Uncomment to check if number of solutions is correct ///
 
         List<List<List<Integer>>> allCombinations = new ArrayList<>();
 //        int resultNewton = 1;
@@ -39,12 +71,10 @@ public class BruteForceAlgorithm {
 //            resultNewton *= numberOfCombinations;
         }
 
-        /// To check if number of solutions is correct ///
-
 //        System.out.println(resultNewton);
 //        System.out.println(Lists.cartesianProduct(allCombinations).size());
 
-        return Lists.cartesianProduct(allCombinations);
+        solutions = Lists.cartesianProduct(allCombinations);
     }
 
     // returns the all possible combinations of setting demand values for the paths
@@ -58,12 +88,9 @@ public class BruteForceAlgorithm {
             list.add(i);
         }
 
-        //System.out.println(list);
-
         for (int i = 0; i < numberOfPaths; i++) {
             lists.add(list);
         }
-       // System.out.println(lists);
 
         return Lists.cartesianProduct(lists).stream()
                 .filter(product -> demandValue.equals(product.stream().mapToInt(Integer::intValue).sum()))
@@ -77,7 +104,4 @@ public class BruteForceAlgorithm {
         return result;
     }
 
-    public List<Solution> getSolutions() {
-        return solutions;
-    }
 }

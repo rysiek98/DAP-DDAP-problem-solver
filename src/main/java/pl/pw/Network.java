@@ -18,4 +18,12 @@ public class Network {
     public List<Demand> getDemandList() {
         return demandList;
     }
+
+    public int getNumberOfDemands() {
+        return demandList.size();
+    }
+
+    public List<Link> getLinkList() {
+        return linkList;
+    }
 }
