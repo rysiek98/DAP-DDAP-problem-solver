@@ -1,4 +1,4 @@
-package main.java.pl.pw;
+package pl.pw;
 
 import java.util.List;
 
