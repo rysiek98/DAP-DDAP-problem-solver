@@ -14,4 +14,8 @@ public class Network {
         this.linkList = linkList;
         this.demandList = demandList;
     }
+
+    public List<Demand> getDemandList() {
+        return demandList;
+    }
 }

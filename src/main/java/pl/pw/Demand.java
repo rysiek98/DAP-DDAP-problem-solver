@@ -65,4 +65,6 @@ public class Demand {
     {
         pathList.add(path);
     }
+
+    public int getNumberOfPaths() { return pathList.size(); }
 }
