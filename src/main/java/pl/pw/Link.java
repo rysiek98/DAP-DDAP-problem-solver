@@ -6,7 +6,7 @@ public class Link {
     private Node startNode;
     private Node endNode;
     private int numberOfFibre;
-    private float cost;
+    private double cost;
     private int lambdas;
     private  int usedLambdas;
 
@@ -46,7 +46,7 @@ public class Link {
         this.numberOfFibre = numberOfFibre;
     }
 
-    public float getCost() {
+    public double getCost() {
         return cost;
     }
 
@@ -54,7 +54,7 @@ public class Link {
         return lambdas;
     }
 
-    public void setCost(float cost) {
+    public void setCost(double cost) {
         this.cost = cost;
     }
 
@@ -66,11 +66,11 @@ public class Link {
 
     public void setUsedLambdas(int usedLambdas) { this.usedLambdas = usedLambdas; }
 
-    public  void updateUsedLambdas(int usedLambdas) { this.usedLambdas += usedLambdas; }
+    public  void updateUsedLambdas(int usedLambdas) { this.usedLambdas = this.usedLambdas + usedLambdas; }
 
-    public float calculateCost()
+    public double calculateCost()
     {
-        float usdeFibrePairs = usedLambdas/lambdas/2;   // TODO nie wiem czy tu dzielić przez 2, bo na slajdach jest fibre pair of cables
+        double usdeFibrePairs = Math.ceil(Double.valueOf(this.usedLambdas)/Double.valueOf(this.lambdas)/2);   // TODO nie wiem czy tu dzielić przez 2, bo na slajdach jest fibre pair of cables
         return usdeFibrePairs * cost;
     }
 

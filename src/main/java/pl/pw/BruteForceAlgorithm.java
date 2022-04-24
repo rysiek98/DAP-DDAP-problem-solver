@@ -18,61 +18,76 @@ public class BruteForceAlgorithm {
 
     public void computeDDAP() {
 
-        float minCost = Float.MAX_VALUE;
-        List<List<Integer>> bestSolution = new ArrayList<>();
+        System.out.println("BRUTE FORCE DDAP");
+
+        double minCost = Double.MAX_VALUE;
+        List<List<List<Integer>>> bestSolutions = new ArrayList<>();
 
         for(List<List<Integer>> solution : solutions) {
-            float cost = 0;
-            boolean newSolution = true;
+            double cost = 0;
+
+            for(Link link : network.getLinkList())
+            {
+                link.setUsedLambdas(0);
+            }
 
             for(int demandId = 1; demandId <= network.getNumberOfDemands(); demandId++) {
 
                 for(Path path : network.getDemandList().get(demandId -1).getPathList()) {
 
+                    int pathVolume = solution.get(demandId-1).get(path.getId()-1);
+
                     for(Link link : path.getLinkList()) {
 
-                        if(newSolution) {
-                            link.setUsedLambdas(0);
-                            newSolution = false;
+                        for(Link netLink : network.getLinkList()) {
+
+                            if(link.getId() == netLink.getId()){
+                                netLink.updateUsedLambdas(pathVolume);
+                            }
                         }
-                        link.updateUsedLambdas(network.getDemandList().get(demandId -1).getDemandVolume());
                     }
                 }
             }
+
 
             for(Link link : network.getLinkList())
             {
                 cost += link.calculateCost();
             }
 
-            if(cost< minCost) {
-                minCost = cost;
-                bestSolution = solution;
+            if(cost == minCost) {
+                bestSolutions.add(solution);
             }
+            else if(cost < minCost) {
+                minCost = cost;
+                bestSolutions.clear();
+                bestSolutions.add(solution);
+            }
+
+            // TODO write solution and cost to file
         }
 
-        System.out.println(minCost);
-        System.out.println(bestSolution);
+        System.out.println("List of best solutions:\n" + bestSolutions);
+        System.out.println("Minimal cost: " + minCost);
     }
 
 
     public void createAllSolutions() {
 
-        /// Uncomment to check if number of solutions is correct ///
+        System.out.println("BRUTE FORCE ALGORITHM: creating all possible solutions");
 
         List<List<List<Integer>>> allCombinations = new ArrayList<>();
-//        int resultNewton = 1;
+        int resultNewton = 1;
 
         for(Demand d : network.getDemandList()) {
-            System.out.println(getCombinations(d.getDemandVolume(), d.getNumberOfPaths()));
             allCombinations.add(getCombinations(d.getDemandVolume(), d.getNumberOfPaths()));
 
-//            Integer numberOfCombinations = calculateNewtonSymbol(d.getNumberOfPaths() + d.getDemandVolume() - 1, d.getDemandVolume());
-//            resultNewton *= numberOfCombinations;
+            Integer numberOfCombinations = calculateNewtonSymbol(d.getNumberOfPaths() + d.getDemandVolume() - 1, d.getDemandVolume());
+            resultNewton *= numberOfCombinations;
         }
 
-//        System.out.println(resultNewton);
-//        System.out.println(Lists.cartesianProduct(allCombinations).size());
+        System.out.println("Newton symbol result: " + resultNewton);
+        System.out.println("Created number of solutions: " + Lists.cartesianProduct(allCombinations).size() + "\n");
 
         solutions = Lists.cartesianProduct(allCombinations);
     }
