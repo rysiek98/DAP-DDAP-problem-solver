@@ -2,9 +2,7 @@ package pl.pw;
 
 import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class EvolutionaryAlgorithm {
@@ -31,11 +29,12 @@ public class EvolutionaryAlgorithm {
     private int currentMutation;
     private int currentGenerationsWithNoImprovement;
 
-    // constructor for development purpose only!! // TODO remove this constructor later XD
+    // constructor for development purpose only!! // TODO remove this constructor later XD (Zaloze sie że zostanie do końca xd)
     public EvolutionaryAlgorithm(Network network) {
         this.network = network;
         this.random = new Random(10);
         this.populationSize = 20;
+        this.startPopulation = new ArrayList<>();
     }
 
     public EvolutionaryAlgorithm(Network network, int populationSize, float crossoverProbability,
@@ -58,7 +57,6 @@ public class EvolutionaryAlgorithm {
 
     public void generateStartPopulation() {
         List<List<List<Integer>>> allCombinations = new ArrayList<>();
-        List<List<List<Integer>>> startPopulation = new ArrayList<>();
 
         for(Demand d : network.getDemandList()) {
             allCombinations.add(getCombinations(d.getDemandVolume(), d.getNumberOfPaths()));
@@ -72,11 +70,14 @@ public class EvolutionaryAlgorithm {
                 int randomIndex = random.nextInt(allCombinations.get(j).size());
                 chromosome.add(allCombinations.get(j).get(randomIndex));
             }
-            startPopulation.add(chromosome);
+            if(startPopulation.indexOf(chromosome) == -1) {
+                startPopulation.add(chromosome);
+            }
         }
 
         System.out.println("Size: " + startPopulation.size());
         System.out.println("Start population: " + startPopulation);
+        System.out.println(fitnessFunction());
     }
 
     public List<List<Integer>> getCombinations(Integer demandValue, Integer numberOfPaths) {
@@ -94,5 +95,44 @@ public class EvolutionaryAlgorithm {
         return Lists.cartesianProduct(lists).stream()
                 .filter(product -> demandValue.equals(product.stream().mapToInt(Integer::intValue).sum()))
                 .collect(Collectors.toList());
+    }
+
+    public List<List<Double>> fitnessFunction() {
+        List<List<Double>> quality = new ArrayList<>();
+        List<Double> costList = new ArrayList<>();
+        List<Double> zList = new ArrayList<>();
+        List<Double> solutionZValues = new ArrayList<>();
+        double z = 0;
+        double cost = 0;
+        for (int i = 0; i < startPopulation.size(); i++) {
+            cost = 0;
+            z = 0;
+            for (int demandId = 1; demandId <= network.getNumberOfDemands(); demandId++) {
+                for (Path path : network.getDemandList().get(demandId - 1).getPathList()) {
+                    int pathVolume = startPopulation.get(i).get(demandId - 1).get(path.getId() - 1);
+
+                    for (Link link : path.getLinkList()) {
+                        for (Link netLink : network.getLinkList()) {
+                            if (link.getId() == netLink.getId()) {
+                                netLink.updateUsedLambdas(pathVolume);
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (Link link : network.getLinkList()) {
+                solutionZValues.add(link.getUsedLambdas() - link.countCe());
+                cost += link.calculateCost();
+                link.setUsedLambdas(0);
+            }
+            z = Collections.max(solutionZValues);
+            costList.add(cost);
+            zList.add(z);
+            solutionZValues.clear();
+        }
+        quality.add(costList);
+        quality.add(zList);
+        return quality;
     }
 }

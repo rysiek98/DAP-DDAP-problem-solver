@@ -11,8 +11,8 @@ public class Program {
         List<Link> links = null;
         List<Demand> demands = null;
         try {
-            linksData = Parser.readDataLinks("src/main/resources/net12_1.txt");
-            demandsData = Parser.readDataDemands("src/main/resources/net12_1.txt");
+            linksData = Parser.readDataLinks("src/main/resources/net4.txt");
+            demandsData = Parser.readDataDemands("src/main/resources/net4.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -20,17 +20,10 @@ public class Program {
         demands = Parser.createDemands(demandsData, links);
         Network network = new Network(links, demands);
 
-<<<<<<< HEAD
         // BruteForceAlgorithm BA = new BruteForceAlgorithm(network);
+        // BA.computeDAP();
         // BA.computeDDAP();
-
         EvolutionaryAlgorithm EA = new EvolutionaryAlgorithm(network);
         EA.generateStartPopulation();
-
-=======
-        BruteForceAlgorithm bruteForceAlgorithm = new BruteForceAlgorithm(network);
-        bruteForceAlgorithm.computeDAP();
-        bruteForceAlgorithm.computeDDAP();
->>>>>>> 161f57432675930e06d8a7804afcbc33d2934348
     }
 }
