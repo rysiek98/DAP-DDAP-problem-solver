@@ -14,70 +14,74 @@ public class BruteForceAlgorithm {
     public BruteForceAlgorithm(Network network) {
         this.network = network;
         solutions = new ArrayList<>();
+        try {
+            createAllSolutions();
+        }
+        catch (Exception e) {
+            System.out.println("EXCEPTION: Too big network fo BFA");
+            solutions.clear();
+        }
     }
 
     public void computeDDAP() {
 
-        System.out.println("BRUTE FORCE DDAP");
+        if(!solutions.isEmpty()) {
+            System.out.println("BRUTE FORCE DDAP");
 
-        double minCost = Double.MAX_VALUE;
-        List<List<List<Integer>>> bestSolutions = new ArrayList<>();
+            double minCost = Double.MAX_VALUE;
+            List<List<List<Integer>>> bestSolutions = new ArrayList<>();
 
-        for(List<List<Integer>> solution : solutions) {
-            double cost = 0;
+            for (List<List<Integer>> solution : solutions) {
+                double cost = 0;
 
-            for(Link link : network.getLinkList())
-            {
-                link.setUsedLambdas(0);
-            }
+                for (Link link : network.getLinkList()) {
+                    link.setUsedLambdas(0);
+                }
 
-            for(int demandId = 1; demandId <= network.getNumberOfDemands(); demandId++) {
+                for (int demandId = 1; demandId <= network.getNumberOfDemands(); demandId++) {
 
-                for(Path path : network.getDemandList().get(demandId -1).getPathList()) {
+                    for (Path path : network.getDemandList().get(demandId - 1).getPathList()) {
 
-                    int pathVolume = solution.get(demandId-1).get(path.getId()-1);
+                        int pathVolume = solution.get(demandId - 1).get(path.getId() - 1);
 
-                    for(Link link : path.getLinkList()) {
+                        for (Link link : path.getLinkList()) {
 
-                        for(Link netLink : network.getLinkList()) {
+                            for (Link netLink : network.getLinkList()) {
 
-                            if(link.getId() == netLink.getId()){
-                                netLink.updateUsedLambdas(pathVolume);
+                                if (link.getId() == netLink.getId()) {
+                                    netLink.updateUsedLambdas(pathVolume);
+                                }
                             }
                         }
                     }
                 }
+
+                for (Link link : network.getLinkList()) {
+                    cost += link.calculateCost();
+                }
+
+                if (cost == minCost) {
+                    bestSolutions.add(solution);
+                } else if (cost < minCost) {
+                    minCost = cost;
+                    bestSolutions.clear();
+                    bestSolutions.add(solution);
+                }
+
+                // TODO write solution and cost to file
             }
 
-            for(Link link : network.getLinkList())
-            {
-                cost += link.calculateCost();
+            System.out.println("Number of best solutions: " + bestSolutions.size());
+            System.out.println("List of best solutions:");
+            for (List<List<Integer>> solution : bestSolutions) {
+                System.out.println(solution);
             }
-
-            if(cost == minCost) {
-                bestSolutions.add(solution);
-            }
-            else if(cost < minCost) {
-                minCost = cost;
-                bestSolutions.clear();
-                bestSolutions.add(solution);
-            }
-
-            // TODO write solution and cost to file
+            System.out.println("Minimal cost: " + minCost);
         }
-
-        System.out.println("Number of best solutions: " + bestSolutions.size());
-        System.out.println("List of best solutions:");
-        for(List<List<Integer>> solution : bestSolutions) {
-            System.out.println(solution);
-        }
-        System.out.println("Minimal cost: " + minCost);
     }
 
 
     public void createAllSolutions() {
-
-        System.out.println("BRUTE FORCE ALGORITHM: creating all possible solutions");
 
         List<List<List<Integer>>> allCombinations = new ArrayList<>();
         int resultNewton = 1;
@@ -89,10 +93,11 @@ public class BruteForceAlgorithm {
             resultNewton *= numberOfCombinations;
         }
 
-        System.out.println("Newton symbol result: " + resultNewton);
-        System.out.println("Created number of solutions: " + Lists.cartesianProduct(allCombinations).size() + "\n");
-
         solutions = Lists.cartesianProduct(allCombinations);
+
+        System.out.println("BRUTE FORCE ALGORITHM: creating all possible solutions");
+        System.out.println("Created number of solutions: " + solutions.size());
+        System.out.println("Newton symbol result: " + resultNewton + "\n");
     }
 
     // returns the all possible combinations of setting demand values for the paths
