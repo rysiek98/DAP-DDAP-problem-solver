@@ -110,11 +110,10 @@ public class BruteForceAlgorithm {
     }
 
     // returns the all possible combinations of setting demand values for the paths
+
     public List<List<Integer>> getCombinations(Integer demandValue, Integer numberOfPaths) {
         List<List<Integer>> lists = new ArrayList();
         List<Integer> list = new ArrayList();
-
-        List<List<List<Integer>>> bigList = new ArrayList<>();
 
         for (int i = 0; i <= demandValue; i++) {
             list.add(i);
@@ -129,7 +128,7 @@ public class BruteForceAlgorithm {
                 .collect(Collectors.toList());
     }
 
-    private int calculateNewtonSymbol(int n, int k) {
+    public int calculateNewtonSymbol(int n, int k) {
         int result = 1;
         for (int i = 1; i <= k; i++)
             result = result * (n - i + 1) / i;
