@@ -8,7 +8,8 @@ public class Network {
     private List<Demand> demandList;
 
 
-    public Network() { }
+    public Network() {
+    }
 
     public Network(List<Link> linkList, List<Demand> demandList) {
         this.linkList = linkList;
