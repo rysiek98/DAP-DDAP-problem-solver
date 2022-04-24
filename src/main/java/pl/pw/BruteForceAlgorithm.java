@@ -3,6 +3,7 @@ package pl.pw;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,8 +17,7 @@ public class BruteForceAlgorithm {
         solutions = new ArrayList<>();
         try {
             createAllSolutions();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("EXCEPTION: Too big network fo BFA");
             solutions.clear();
         }
@@ -25,17 +25,68 @@ public class BruteForceAlgorithm {
 
     public void computeDAP() {
 
-        if(!solutions.isEmpty()) {
+        if (!solutions.isEmpty()) {
             System.out.println("BRUTE FORCE DAP");
+            double Ce = 0;
+            double minZ = Double.MAX_VALUE;
+            double z = 0;
+            List<Double> linksZ = new ArrayList<>();
+            List<List<List<Integer>>> bestSolutions = new ArrayList<>();
 
+            for (List<List<Integer>> solution : solutions) {
+                linksZ.clear();
+                z = 0;
 
+                for (Link link : network.getLinkList()) {
+                    link.setUsedLambdas(0);
+                }
 
+                for (int demandId = 1; demandId <= network.getNumberOfDemands(); demandId++) {
+
+                    for (Path path : network.getDemandList().get(demandId - 1).getPathList()) {
+
+                        int pathVolume = solution.get(demandId - 1).get(path.getId() - 1);
+
+                        for (Link link : path.getLinkList()) {
+
+                            for (Link netLink : network.getLinkList()) {
+
+                                if (link.getId() == netLink.getId()) {
+                                    netLink.updateUsedLambdas(pathVolume);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for (Link link : network.getLinkList()) {
+                    linksZ.add(link.getUsedLambdas() - link.countCe());
+                }
+                z = Collections.max(linksZ);
+
+                if (z == minZ) {
+                    bestSolutions.add(solution);
+                } else if (z < minZ) {
+                    minZ = z;
+                    bestSolutions.clear();
+                    bestSolutions.add(solution);
+                }
+
+                // TODO write solution and cost to file
+            }
+
+            System.out.println("Number of best solutions: " + bestSolutions.size());
+            System.out.println("List of best solutions:");
+            for (List<List<Integer>> solution : bestSolutions) {
+                System.out.println(solution);
+            }
+            System.out.println("Minimal z: " + minZ);
         }
     }
 
     public void computeDDAP() {
 
-        if(!solutions.isEmpty()) {
+        if (!solutions.isEmpty()) {
             System.out.println("BRUTE FORCE DDAP");
 
             double minCost = Double.MAX_VALUE;
@@ -95,7 +146,7 @@ public class BruteForceAlgorithm {
         List<List<List<Integer>>> allCombinations = new ArrayList<>();
         int resultNewton = 1;
 
-        for(Demand d : network.getDemandList()) {
+        for (Demand d : network.getDemandList()) {
             allCombinations.add(getCombinations(d.getDemandVolume(), d.getNumberOfPaths()));
 
             long numberOfCombinations = calculateNewtonSymbol(d.getNumberOfPaths() + d.getDemandVolume() - 1, d.getDemandVolume());
