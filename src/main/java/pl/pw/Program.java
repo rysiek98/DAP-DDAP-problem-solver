@@ -21,6 +21,6 @@ public class Program {
         Network network = new Network(links, demands);
 
         BruteForceAlgorithm bruteForceAlgorithm = new BruteForceAlgorithm(network);
-        bruteForceAlgorithm.computeDDAP();
+        bruteForceAlgorithm.computeDAP();
     }
 }

@@ -74,4 +74,8 @@ public class Link {
         return usdeFibrePairs * cost;
     }
 
+    public double countCe() {
+        return lambdas * numberOfFibre;
+    }
+
 }
