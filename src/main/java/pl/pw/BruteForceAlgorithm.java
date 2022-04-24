@@ -3,6 +3,7 @@ package pl.pw;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +30,11 @@ public class BruteForceAlgorithm {
             double Ce = 0;
             double minZ = Double.MAX_VALUE;
             double z = 0;
+            List<Double> linksZ = new ArrayList<>();
             List<List<List<Integer>>> bestSolutions = new ArrayList<>();
 
             for (List<List<Integer>> solution : solutions) {
+                linksZ.clear();
                 z = 0;
 
                 for (Link link : network.getLinkList()) {
@@ -57,8 +60,9 @@ public class BruteForceAlgorithm {
                 }
 
                 for (Link link : network.getLinkList()) {
-                    z += link.getUsedLambdas() - link.countCe();
+                    linksZ.add(link.getUsedLambdas() - link.countCe());
                 }
+                z = Collections.max(linksZ);
 
                 if (z == minZ) {
                     bestSolutions.add(solution);
@@ -76,7 +80,7 @@ public class BruteForceAlgorithm {
             for (List<List<Integer>> solution : bestSolutions) {
                 System.out.println(solution);
             }
-            System.out.println("Minimum mean value of z: " + minZ/network.getLinkList().size());
+            System.out.println("Minimal z: " + minZ);
         }
     }
 
