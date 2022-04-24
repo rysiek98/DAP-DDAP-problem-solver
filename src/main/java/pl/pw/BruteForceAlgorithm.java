@@ -49,7 +49,6 @@ public class BruteForceAlgorithm {
                 }
             }
 
-
             for(Link link : network.getLinkList())
             {
                 cost += link.calculateCost();
@@ -67,7 +66,11 @@ public class BruteForceAlgorithm {
             // TODO write solution and cost to file
         }
 
-        System.out.println("List of best solutions:\n" + bestSolutions);
+        System.out.println("Number of best solutions: " + bestSolutions.size());
+        System.out.println("List of best solutions:");
+        for(List<List<Integer>> solution : bestSolutions) {
+            System.out.println(solution);
+        }
         System.out.println("Minimal cost: " + minCost);
     }
 
@@ -82,7 +85,7 @@ public class BruteForceAlgorithm {
         for(Demand d : network.getDemandList()) {
             allCombinations.add(getCombinations(d.getDemandVolume(), d.getNumberOfPaths()));
 
-            Integer numberOfCombinations = calculateNewtonSymbol(d.getNumberOfPaths() + d.getDemandVolume() - 1, d.getDemandVolume());
+            long numberOfCombinations = calculateNewtonSymbol(d.getNumberOfPaths() + d.getDemandVolume() - 1, d.getDemandVolume());
             resultNewton *= numberOfCombinations;
         }
 
@@ -113,7 +116,7 @@ public class BruteForceAlgorithm {
     }
 
     private int calculateNewtonSymbol(int n, int k) {
-        Integer result = 1;
+        int result = 1;
         for (int i = 1; i <= k; i++)
             result = result * (n - i + 1) / i;
         return result;

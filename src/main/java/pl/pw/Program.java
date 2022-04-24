@@ -23,6 +23,5 @@ public class Program {
         BruteForceAlgorithm bruteForceAlgorithm = new BruteForceAlgorithm(network);
         bruteForceAlgorithm.createAllSolutions();
         bruteForceAlgorithm.computeDDAP();
-
     }
 }

@@ -70,7 +70,7 @@ public class Link {
 
     public double calculateCost()
     {
-        double usdeFibrePairs = Math.ceil(Double.valueOf(this.usedLambdas)/Double.valueOf(this.lambdas)/2);   // TODO nie wiem czy tu dzielić przez 2, bo na slajdach jest fibre pair of cables
+        double usdeFibrePairs = Math.ceil(Double.valueOf(this.usedLambdas)/Double.valueOf(this.lambdas));   // TODO nie wiem czy tu dzielić przez 2, bo na slajdach jest fibre pair of cables
         return usdeFibrePairs * cost;
     }
 
