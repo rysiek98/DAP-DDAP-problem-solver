@@ -23,6 +23,16 @@ public class BruteForceAlgorithm {
         }
     }
 
+    public void computeDAP() {
+
+        if(!solutions.isEmpty()) {
+            System.out.println("BRUTE FORCE DAP");
+
+
+
+        }
+    }
+
     public void computeDDAP() {
 
         if(!solutions.isEmpty()) {
@@ -79,7 +89,6 @@ public class BruteForceAlgorithm {
             System.out.println("Minimal cost: " + minCost);
         }
     }
-
 
     public void createAllSolutions() {
 
