@@ -9,7 +9,7 @@ public class EvolutionaryAlgorithm {
 
     protected Network network;
 
-    private List<List<List<Integer>>> startPopulation;
+    private List<List<List<Integer>>> baseGeneration;
     private List<List<List<Integer>>> nextGeneration;
 
     // input data
@@ -22,6 +22,7 @@ public class EvolutionaryAlgorithm {
     private int maxNumberOfGenerations;
     private int maxNumberOfMutations;
     private int maxComputationTime;
+    private long endTime;
     private int maxNumberOfGenerationsWithNoImprovement;
 
     // current state
@@ -34,7 +35,7 @@ public class EvolutionaryAlgorithm {
         this.network = network;
         this.random = new Random(10);
         this.populationSize = 20;
-        this.startPopulation = new ArrayList<>();
+        this.baseGeneration = new ArrayList<>();
     }
 
     public EvolutionaryAlgorithm(Network network, int populationSize, float crossoverProbability,
@@ -55,6 +56,49 @@ public class EvolutionaryAlgorithm {
         this.currentGenerationsWithNoImprovement = 0;
     }
 
+    public void computeDAP() {
+
+        while(checkStopCriterion()) {
+
+
+
+        }
+    }
+
+    public void computeDDAP() {
+
+        List<List<Integer>> bestSolution = new ArrayList<>();
+
+        while(checkStopCriterion()) {
+
+            currentGeneration++;
+
+            //maxTime w sec
+            endTime = System.currentTimeMillis() + maxComputationTime * 1000;
+
+            // TODO funkcja znajdująca najlepsze rozwiązanie findBestSolution() może zwracać tylko jedno, nawet jeśli jest więcej
+            // List<List<Integer>> bestSolution = findBestSolutionDDAP(baseGeneration);
+            int baseGenMinCost = 2137; // TODO base generation: best solution's cost
+
+            nextGeneration.add(bestSolution);
+
+            // TODO crossover
+
+            // TODO mutation
+
+            int nextGenMinCost = 2137; // TODO next generation: best solution's cost
+
+            if(nextGenMinCost < baseGenMinCost) { currentGenerationsWithNoImprovement = 0; }
+            else { currentGenerationsWithNoImprovement++; }
+
+
+            baseGeneration = nextGeneration;
+            nextGeneration.clear();
+        }
+        // return bestSolution;
+    }
+
+
     public void generateStartPopulation() {
         List<List<List<Integer>>> allCombinations = new ArrayList<>();
 
@@ -70,13 +114,13 @@ public class EvolutionaryAlgorithm {
                 int randomIndex = random.nextInt(allCombinations.get(j).size());
                 chromosome.add(allCombinations.get(j).get(randomIndex));
             }
-            if(startPopulation.indexOf(chromosome) == -1) {
-                startPopulation.add(chromosome);
+            if(baseGeneration.indexOf(chromosome) == -1) {
+                baseGeneration.add(chromosome);
             }
         }
 
-        System.out.println("Size: " + startPopulation.size());
-        System.out.println("Start population: " + startPopulation);
+        System.out.println("Size: " + baseGeneration.size());
+        System.out.println("Start population: " + baseGeneration);
         System.out.println(fitnessFunction());
     }
 
@@ -104,12 +148,12 @@ public class EvolutionaryAlgorithm {
         List<Double> solutionZValues = new ArrayList<>();
         double z = 0;
         double cost = 0;
-        for (int i = 0; i < startPopulation.size(); i++) {
+        for (int i = 0; i < baseGeneration.size(); i++) {
             cost = 0;
             z = 0;
             for (int demandId = 1; demandId <= network.getNumberOfDemands(); demandId++) {
                 for (Path path : network.getDemandList().get(demandId - 1).getPathList()) {
-                    int pathVolume = startPopulation.get(i).get(demandId - 1).get(path.getId() - 1);
+                    int pathVolume = baseGeneration.get(i).get(demandId - 1).get(path.getId() - 1);
 
                     for (Link link : path.getLinkList()) {
                         for (Link netLink : network.getLinkList()) {
@@ -133,6 +177,18 @@ public class EvolutionaryAlgorithm {
         }
         quality.add(costList);
         quality.add(zList);
+        
         return quality;
+    }
+
+    // returns true if the the algorithm should stop
+    public boolean checkStopCriterion() {
+
+        if (this.currentGeneration >= this.maxNumberOfGenerations) { return true; }
+        else if (this.currentMutation >= this.maxNumberOfMutations) { return true; }
+        else if (this.currentGenerationsWithNoImprovement >= this.maxNumberOfGenerationsWithNoImprovement) { return true; }
+        else if (System.currentTimeMillis() >= this.endTime) { return true; }
+        else { return false; }
+
     }
 }

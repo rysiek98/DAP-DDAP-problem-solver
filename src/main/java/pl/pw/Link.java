@@ -70,8 +70,8 @@ public class Link {
 
     public double calculateCost()
     {
-        double usdeFibrePairs = Math.ceil(Double.valueOf(this.usedLambdas)/Double.valueOf(this.lambdas));   // TODO nie wiem czy tu dzielić przez 2, bo na slajdach jest fibre pair of cables
-        return usdeFibrePairs * cost;
+        double usedFibrePairs = Math.ceil((double) this.usedLambdas / (double) this.lambdas);
+        return usedFibrePairs * cost;
     }
 
     public double countCe() {
