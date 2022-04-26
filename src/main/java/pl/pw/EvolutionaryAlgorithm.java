@@ -24,6 +24,7 @@ public class EvolutionaryAlgorithm {
     private int maxComputationTime;
     private long endTime;
     private int maxNumberOfGenerationsWithNoImprovement;
+    private int numberOfCrossovers;
 
     // current state
     private int currentGeneration;
@@ -41,6 +42,7 @@ public class EvolutionaryAlgorithm {
         this.maxNumberOfGenerations = 100;
         this.maxNumberOfGenerationsWithNoImprovement = 10;
         this.maxNumberOfMutations = 10;
+        this.numberOfCrossovers = 3;
     }
 
     public EvolutionaryAlgorithm(Network network, int populationSize, float crossoverProbability,
@@ -63,55 +65,61 @@ public class EvolutionaryAlgorithm {
 
     public void computeDAP() {
 
-        while(checkStopCriterion()) {
-
+        while (checkStopCriterion()) {
 
 
         }
     }
 
-    public void computeDDAP() {
+    public Chromosome computeDDAP() {
 
-        Chromosome baseGenBestSolution;
-        Chromosome nextGenBestSolution;
+        Chromosome baseGenBestSolution = new Chromosome();
+        Chromosome nextGenBestSolution = new Chromosome();
 
         endTime = System.currentTimeMillis() + maxComputationTime * 10;
 
-        while(checkStopCriterion()) {
+        while (checkStopCriterion()) {
             System.out.println(currentGeneration);
             currentGeneration++;
 
             //maxTime w sec
             endTime = System.currentTimeMillis() + maxComputationTime * 10;
-            // TODO funkcja znajdująca najlepsze rozwiązanie findBestSolution() może zwracać tylko jedno, nawet jeśli jest więcej
+
+            //best solution
             baseGenBestSolution = findBestSolutionDDAP(baseGeneration);
             nextGeneration.add(baseGenBestSolution);
 
-            // TODO crossover
-            crossover(1);
-            crossover(2);
-            crossover(3);
-            // TODO mutation
+            //crossover
+            for (int i = 0; i < numberOfCrossovers; i++) {
+                crossover(i);
+            }
 
-            // TODO next generation: best solution's cost
+            //mutation
+            mutation();
+
+            //next generation: best solution's cost
             nextGenBestSolution = findBestSolutionDDAP(nextGeneration);
 
-            if(nextGenBestSolution.getCost() < baseGenBestSolution.getCost()) { currentGenerationsWithNoImprovement = 0; }
-            else { currentGenerationsWithNoImprovement++; }
+            if (nextGenBestSolution.getCost() < baseGenBestSolution.getCost()) {
+                currentGenerationsWithNoImprovement = 0;
+            } else {
+                currentGenerationsWithNoImprovement++;
+            }
 
             baseGeneration = new ArrayList<>(nextGeneration);
             nextGeneration.clear();
         }
-        System.out.print("Population after "+ currentGeneration+" generations:");
-        for (Chromosome c: baseGeneration){
+
+        System.out.print("Population after " + currentGeneration + " generations:");
+        for (Chromosome c : baseGeneration) {
             System.out.print(c.getGens());
         }
         System.out.println();
         baseGeneration = fitnessFunction(baseGeneration);
-        for (Chromosome c: baseGeneration){
-            System.out.print("cost: "+ c.getCost()+" z: "+c.getZ()+"; ");
+        for (Chromosome c : baseGeneration) {
+            System.out.print("cost: " + c.getCost() + " z: " + c.getZ() + "; ");
         }
-        // return bestSolution;
+        return nextGenBestSolution;
     }
 
     private Chromosome findBestSolutionDDAP(List<Chromosome> baseGeneration) {
@@ -120,68 +128,98 @@ public class EvolutionaryAlgorithm {
         return baseGeneration.get(0);
     }
 
-    private void crossover(int round){
-        int it = 0;
+    private void crossover(int round) {
         List<List<Integer>> gensA;
         List<List<Integer>> gensB;
         List<List<Integer>> childAGens = new ArrayList<>();
         List<List<Integer>> childBGens = new ArrayList<>();
         Chromosome parentA = baseGeneration.get(round);
-        Chromosome parentB = baseGeneration.get(round+1);
+        Chromosome parentB = baseGeneration.get(round + 1);
+        int it = (int) Math.floor(parentA.getGens().size() / 2);
         gensA = parentA.getGens();
         gensB = parentB.getGens();
-        List<Integer> tmpA;
-        List<Integer> tmpB;
-        for(int i = 0; i < gensA.size(); i++){
-            tmpA = new ArrayList<>();
-            tmpB = new ArrayList<>();
-            it = (int) Math.floor(gensA.get(i).size()/2);
-            for (int j = 0; j < it; j++){
-                tmpA.add(gensA.get(i).get(j));
-                tmpB.add(gensB.get(i).get(j));
-            }
-            for (int j = it; j < gensA.get(i).size(); j++){
-                tmpA.add(gensB.get(i).get(j));
-                tmpB.add(gensA.get(i).get(j));
-            }
-            childAGens.add(tmpA);
-            childBGens.add(tmpB);
-        }
-        Chromosome childA = new Chromosome(childAGens);
-        Chromosome childB = new Chromosome(childBGens);
 
-        nextGeneration.add(childA);
-        nextGeneration.add(childB);
+        for (int i = 0; i < it; i++) {
+            childAGens.add(gensA.get(i));
+            childBGens.add(gensB.get(i));
+        }
+
+        for (int i = it; i < gensA.size(); i++) {
+            {
+                childAGens.add(gensB.get(i));
+                childBGens.add(gensA.get(i));
+            }
+
+            Chromosome childA = new Chromosome(childAGens);
+            Chromosome childB = new Chromosome(childBGens);
+
+            nextGeneration.add(childA);
+            nextGeneration.add(childB);
+        }
+    }
+
+    private void mutation() {
+        if (Math.random() * 100 > 10) {
+            List<Integer> tmpGen = new ArrayList<>();
+            List<List<Integer>> gens = new ArrayList<>();
+            int tmpValue = 0;
+            int x = (int) Math.random() * baseGeneration.size();
+            Chromosome mutant = baseGeneration.get(x);
+            for (int i = 0; i < mutant.getGens().size(); i++) {
+                tmpGen = new ArrayList<>();
+                if (i % 2 == 0) {
+                    for (int j = 0; j < mutant.getGens().get(i).size(); j++) {
+                        if(mutant.getGens().get(i).get(j) > 0){
+                            tmpGen.add(mutant.getGens().get(i).get(j)-1);
+                            tmpValue++;
+                        }else {
+                            tmpGen.add(mutant.getGens().get(i).get(j)+tmpValue);
+                            tmpValue = 0;
+                        }
+                    }
+                    if(tmpValue != 0){
+                        tmpGen.set(0,tmpValue+tmpGen.get(0));
+                        tmpValue = 0;
+                    }
+                } else {
+                    tmpGen = mutant.getGens().get(i);
+                }
+                gens.add(tmpGen);
+            }
+            mutant.setGens(gens);
+            mutant = fitnessFunction(mutant);
+            nextGeneration.add(mutant);
+        }
     }
 
     public void generateStartPopulation() {
         List<List<List<Integer>>> allCombinations = new ArrayList<>();
 
-        for(Demand d : network.getDemandList()) {
+        for (Demand d : network.getDemandList()) {
             allCombinations.add(getCombinations(d.getDemandVolume(), d.getNumberOfPaths()));
         }
 
         Chromosome chromosome;
-        for(int i = 0; i < populationSize; i++) {
+        for (int i = 0; i < populationSize; i++) {
 
             chromosome = new Chromosome();
             List<List<Integer>> gens = new ArrayList<>();
 
-            for(int j = 0; j < allCombinations.size(); j++) {
+            for (int j = 0; j < allCombinations.size(); j++) {
                 int randomIndex = random.nextInt(allCombinations.get(j).size());
                 gens.add(allCombinations.get(j).get(randomIndex));
             }
             chromosome.setGens(gens);
-            if(baseGeneration.indexOf(chromosome) == -1) {
+            if (baseGeneration.indexOf(chromosome) == -1) {
                 baseGeneration.add(chromosome);
-            }else {
+            } else {
                 chromosome = null;
             }
         }
 
         System.out.println("Size: " + baseGeneration.size());
         System.out.print("Start population: ");
-        for (Chromosome c: baseGeneration){
+        for (Chromosome c : baseGeneration) {
             System.out.print(c.getGens());
         }
         System.out.println();
@@ -202,6 +240,10 @@ public class EvolutionaryAlgorithm {
         return Lists.cartesianProduct(lists).stream()
                 .filter(product -> demandValue.equals(product.stream().mapToInt(Integer::intValue).sum()))
                 .collect(Collectors.toList());
+    }
+
+    public Chromosome fitnessFunction(Chromosome chromosomes) {
+        return fitnessFunction(List.of(chromosomes)).get(0);
     }
 
     public List<Chromosome> fitnessFunction(List<Chromosome> chromosomes) {
@@ -236,21 +278,22 @@ public class EvolutionaryAlgorithm {
             solutionZValues.clear();
         }
         return chromosomes;
-     }
+    }
 
     // returns true if the the algorithm should stop
     public boolean checkStopCriterion() {
 
         if (this.currentGeneration >= this.maxNumberOfGenerations) {
-            return false; }
-        else if (this.currentMutation >= this.maxNumberOfMutations) {
-            return false; }
-        else if (this.currentGenerationsWithNoImprovement >= this.maxNumberOfGenerationsWithNoImprovement) {
-            return false; }
-        else if (System.currentTimeMillis() >= this.endTime) {
-            return false; }
-        else {
-            return true; }
+            return false;
+        } else if (this.currentMutation >= this.maxNumberOfMutations) {
+            return false;
+        } else if (this.currentGenerationsWithNoImprovement >= this.maxNumberOfGenerationsWithNoImprovement) {
+            return false;
+        } else if (System.currentTimeMillis() >= this.endTime) {
+            return false;
+        } else {
+            return true;
+        }
 
     }
 }
