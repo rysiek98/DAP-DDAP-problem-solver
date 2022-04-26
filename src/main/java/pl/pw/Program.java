@@ -25,5 +25,6 @@ public class Program {
         // BA.computeDDAP();
         EvolutionaryAlgorithm EA = new EvolutionaryAlgorithm(network);
         EA.generateStartPopulation();
+        EA.computeDDAP();
     }
 }

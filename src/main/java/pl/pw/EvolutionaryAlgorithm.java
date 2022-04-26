@@ -9,8 +9,8 @@ public class EvolutionaryAlgorithm {
 
     protected Network network;
 
-    private List<List<List<Integer>>> baseGeneration;
-    private List<List<List<Integer>>> nextGeneration;
+    private List<Chromosome> baseGeneration;
+    private List<Chromosome> nextGeneration;
 
     // input data
     private int populationSize;
@@ -36,6 +36,11 @@ public class EvolutionaryAlgorithm {
         this.random = new Random(10);
         this.populationSize = 20;
         this.baseGeneration = new ArrayList<>();
+        this.nextGeneration = new ArrayList<>();
+        this.maxComputationTime = 100;
+        this.maxNumberOfGenerations = 100;
+        this.maxNumberOfGenerationsWithNoImprovement = 10;
+        this.maxNumberOfMutations = 10;
     }
 
     public EvolutionaryAlgorithm(Network network, int populationSize, float crossoverProbability,
@@ -67,37 +72,87 @@ public class EvolutionaryAlgorithm {
 
     public void computeDDAP() {
 
-        List<List<Integer>> bestSolution = new ArrayList<>();
+        Chromosome baseGenBestSolution;
+        Chromosome nextGenBestSolution;
+
+        endTime = System.currentTimeMillis() + maxComputationTime * 10;
 
         while(checkStopCriterion()) {
-
+            System.out.println(currentGeneration);
             currentGeneration++;
 
             //maxTime w sec
-            endTime = System.currentTimeMillis() + maxComputationTime * 1000;
-
+            endTime = System.currentTimeMillis() + maxComputationTime * 10;
             // TODO funkcja znajdująca najlepsze rozwiązanie findBestSolution() może zwracać tylko jedno, nawet jeśli jest więcej
-            // List<List<Integer>> bestSolution = findBestSolutionDDAP(baseGeneration);
-            int baseGenMinCost = 2137; // TODO base generation: best solution's cost
-
-            nextGeneration.add(bestSolution);
+            baseGenBestSolution = findBestSolutionDDAP(baseGeneration);
+            nextGeneration.add(baseGenBestSolution);
 
             // TODO crossover
-
+            crossover(1);
+            crossover(2);
+            crossover(3);
             // TODO mutation
 
-            int nextGenMinCost = 2137; // TODO next generation: best solution's cost
+            // TODO next generation: best solution's cost
+            nextGenBestSolution = findBestSolutionDDAP(nextGeneration);
 
-            if(nextGenMinCost < baseGenMinCost) { currentGenerationsWithNoImprovement = 0; }
+            if(nextGenBestSolution.getCost() < baseGenBestSolution.getCost()) { currentGenerationsWithNoImprovement = 0; }
             else { currentGenerationsWithNoImprovement++; }
 
-
-            baseGeneration = nextGeneration;
+            baseGeneration = new ArrayList<>(nextGeneration);
             nextGeneration.clear();
+        }
+        System.out.print("Population after "+ currentGeneration+" generations:");
+        for (Chromosome c: baseGeneration){
+            System.out.print(c.getGens());
+        }
+        System.out.println();
+        baseGeneration = fitnessFunction(baseGeneration);
+        for (Chromosome c: baseGeneration){
+            System.out.print("cost: "+ c.getCost()+" z: "+c.getZ()+"; ");
         }
         // return bestSolution;
     }
 
+    private Chromosome findBestSolutionDDAP(List<Chromosome> baseGeneration) {
+        baseGeneration = fitnessFunction(baseGeneration);
+        baseGeneration.sort(Comparator.comparing(Chromosome::getCost));
+        return baseGeneration.get(0);
+    }
+
+    private void crossover(int round){
+        int it = 0;
+        List<List<Integer>> gensA;
+        List<List<Integer>> gensB;
+        List<List<Integer>> childAGens = new ArrayList<>();
+        List<List<Integer>> childBGens = new ArrayList<>();
+        Chromosome parentA = baseGeneration.get(round);
+        Chromosome parentB = baseGeneration.get(round+1);
+        gensA = parentA.getGens();
+        gensB = parentB.getGens();
+        List<Integer> tmpA;
+        List<Integer> tmpB;
+        for(int i = 0; i < gensA.size(); i++){
+            tmpA = new ArrayList<>();
+            tmpB = new ArrayList<>();
+            it = (int) Math.floor(gensA.get(i).size()/2);
+            for (int j = 0; j < it; j++){
+                tmpA.add(gensA.get(i).get(j));
+                tmpB.add(gensB.get(i).get(j));
+            }
+            for (int j = it; j < gensA.get(i).size(); j++){
+                tmpA.add(gensB.get(i).get(j));
+                tmpB.add(gensA.get(i).get(j));
+            }
+            childAGens.add(tmpA);
+            childBGens.add(tmpB);
+        }
+        Chromosome childA = new Chromosome(childAGens);
+        Chromosome childB = new Chromosome(childBGens);
+
+        nextGeneration.add(childA);
+        nextGeneration.add(childB);
+    }
 
     public void generateStartPopulation() {
         List<List<List<Integer>>> allCombinations = new ArrayList<>();
@@ -106,22 +161,30 @@ public class EvolutionaryAlgorithm {
             allCombinations.add(getCombinations(d.getDemandVolume(), d.getNumberOfPaths()));
         }
 
+        Chromosome chromosome;
         for(int i = 0; i < populationSize; i++) {
 
-            List<List<Integer>> chromosome = new ArrayList<>();
+            chromosome = new Chromosome();
+            List<List<Integer>> gens = new ArrayList<>();
 
             for(int j = 0; j < allCombinations.size(); j++) {
                 int randomIndex = random.nextInt(allCombinations.get(j).size());
-                chromosome.add(allCombinations.get(j).get(randomIndex));
+                gens.add(allCombinations.get(j).get(randomIndex));
             }
+            chromosome.setGens(gens);
             if(baseGeneration.indexOf(chromosome) == -1) {
                 baseGeneration.add(chromosome);
+            }else {
+                chromosome = null;
             }
         }
 
         System.out.println("Size: " + baseGeneration.size());
-        System.out.println("Start population: " + baseGeneration);
-        System.out.println(fitnessFunction());
+        System.out.print("Start population: ");
+        for (Chromosome c: baseGeneration){
+            System.out.print(c.getGens());
+        }
+        System.out.println();
     }
 
     public List<List<Integer>> getCombinations(Integer demandValue, Integer numberOfPaths) {
@@ -141,19 +204,16 @@ public class EvolutionaryAlgorithm {
                 .collect(Collectors.toList());
     }
 
-    public List<List<Double>> fitnessFunction() {
-        List<List<Double>> quality = new ArrayList<>();
-        List<Double> costList = new ArrayList<>();
-        List<Double> zList = new ArrayList<>();
+    public List<Chromosome> fitnessFunction(List<Chromosome> chromosomes) {
         List<Double> solutionZValues = new ArrayList<>();
         double z = 0;
         double cost = 0;
-        for (int i = 0; i < baseGeneration.size(); i++) {
+        for (int i = 0; i < chromosomes.size(); i++) {
             cost = 0;
             z = 0;
             for (int demandId = 1; demandId <= network.getNumberOfDemands(); demandId++) {
                 for (Path path : network.getDemandList().get(demandId - 1).getPathList()) {
-                    int pathVolume = baseGeneration.get(i).get(demandId - 1).get(path.getId() - 1);
+                    int pathVolume = chromosomes.get(i).getGens().get(demandId - 1).get(path.getId() - 1);
 
                     for (Link link : path.getLinkList()) {
                         for (Link netLink : network.getLinkList()) {
@@ -171,24 +231,26 @@ public class EvolutionaryAlgorithm {
                 link.setUsedLambdas(0);
             }
             z = Collections.max(solutionZValues);
-            costList.add(cost);
-            zList.add(z);
+            chromosomes.get(i).setCost(cost);
+            chromosomes.get(i).setZ(z);
             solutionZValues.clear();
         }
-        quality.add(costList);
-        quality.add(zList);
-        
-        return quality;
-    }
+        return chromosomes;
+     }
 
     // returns true if the the algorithm should stop
     public boolean checkStopCriterion() {
 
-        if (this.currentGeneration >= this.maxNumberOfGenerations) { return true; }
-        else if (this.currentMutation >= this.maxNumberOfMutations) { return true; }
-        else if (this.currentGenerationsWithNoImprovement >= this.maxNumberOfGenerationsWithNoImprovement) { return true; }
-        else if (System.currentTimeMillis() >= this.endTime) { return true; }
-        else { return false; }
+        if (this.currentGeneration >= this.maxNumberOfGenerations) {
+            return false; }
+        else if (this.currentMutation >= this.maxNumberOfMutations) {
+            return false; }
+        else if (this.currentGenerationsWithNoImprovement >= this.maxNumberOfGenerationsWithNoImprovement) {
+            return false; }
+        else if (System.currentTimeMillis() >= this.endTime) {
+            return false; }
+        else {
+            return true; }
 
     }
 }
