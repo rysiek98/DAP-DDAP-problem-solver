@@ -86,11 +86,11 @@ public class BruteForceAlgorithm {
 
     public void computeDDAP() {
 
+        List<List<List<Integer>>> bestSolutions = new ArrayList<>();
         if (!solutions.isEmpty()) {
             System.out.println("BRUTE FORCE DDAP");
 
             double minCost = Double.MAX_VALUE;
-            List<List<List<Integer>>> bestSolutions = new ArrayList<>();
 
             for (List<List<Integer>> solution : solutions) {
                 double cost = 0;
@@ -128,8 +128,6 @@ public class BruteForceAlgorithm {
                     bestSolutions.clear();
                     bestSolutions.add(solution);
                 }
-
-                // TODO write solution and cost to file
             }
 
             System.out.println("Number of best solutions: " + bestSolutions.size());
@@ -139,6 +137,8 @@ public class BruteForceAlgorithm {
             }
             System.out.println("Minimal cost: " + minCost);
         }
+        Writer writer = new Writer();
+        writer.writeDDAP(network, bestSolutions.get(0));
     }
 
     public void createAllSolutions() {

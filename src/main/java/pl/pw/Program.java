@@ -28,8 +28,8 @@ public class Program {
         //System.out.println("Przykładowa ścieżka: src\\main\\resources\\net4.txt");
         //path = scanner.next();
         try {
-            linksData = Parser.readDataLinks("src/main/resources/net_triangle_test.txt");
-            demandsData = Parser.readDataDemands("src/main/resources/net_triangle_test.txt");
+            linksData = Parser.readDataLinks("src/main/resources/net4.txt");
+            demandsData = Parser.readDataDemands("src/main/resources/net4.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -80,11 +80,11 @@ public class Program {
         EvolutionaryAlgorithm EA = new EvolutionaryAlgorithm(network);
         EA.generateStartPopulation();
         //EA.computeDAP();
-        EA.computeDDAP();
+        //EA.computeDDAP();
         
-//        BruteForceAlgorithm BA = new BruteForceAlgorithm(network);
+        BruteForceAlgorithm BA = new BruteForceAlgorithm(network);
 //        BA.computeDAP();
-//        BA.computeDDAP();
+        BA.computeDDAP();
 
     }
 }
