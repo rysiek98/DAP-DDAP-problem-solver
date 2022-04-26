@@ -9,6 +9,7 @@ public class EvolutionaryAlgorithm {
 
     protected Network network;
 
+    private List<Chromosome> startPopulation;
     private List<Chromosome> baseGeneration;
     private List<Chromosome> nextGeneration;
 
@@ -35,15 +36,16 @@ public class EvolutionaryAlgorithm {
     public EvolutionaryAlgorithm(Network network) {
         this.network = network;
         this.random = new Random(10);
-        this.populationSize = 20;
+        this.populationSize = 200;
+        this.startPopulation = new ArrayList<>();
         this.baseGeneration = new ArrayList<>();
         this.nextGeneration = new ArrayList<>();
-        this.maxComputationTime = 20;
-        this.maxNumberOfGenerations = 20;
-        this.maxNumberOfGenerationsWithNoImprovement = 19;
-        this.maxNumberOfMutations = 20;
+        this.maxComputationTime = 2000;
+        this.maxNumberOfGenerations = 200;
+        this.maxNumberOfGenerationsWithNoImprovement = 10;
+        this.maxNumberOfMutations = 10000;
         this.crossoverProbability = 50;
-        this.mutationProbability = 50;
+        this.mutationProbability = 20;
     }
 
     public EvolutionaryAlgorithm(Network network, int populationSize, float crossoverProbability,
@@ -66,8 +68,15 @@ public class EvolutionaryAlgorithm {
 
     public void computeDAP() {
 
+        endTime = System.currentTimeMillis() + maxComputationTime * 10;
+        currentMutation = 0;
+        currentGeneration = 0;
+        currentGenerationsWithNoImprovement = 0;
+        baseGeneration = new ArrayList<>(startPopulation);
+
         while (checkStopCriterion()) {
 
+            nextGeneration.clear();
 
         }
     }
@@ -78,8 +87,13 @@ public class EvolutionaryAlgorithm {
         Chromosome nextGenBestSolution = new Chromosome();
 
         endTime = System.currentTimeMillis() + maxComputationTime * 10;
+        currentMutation = 0;
+        currentGeneration = 0;
+        currentGenerationsWithNoImprovement = 0;
+        baseGeneration = new ArrayList<>(startPopulation);
 
         while (checkStopCriterion()) {
+
             nextGeneration.clear();
             System.out.println(currentGeneration);
             currentGeneration++;
@@ -113,7 +127,7 @@ public class EvolutionaryAlgorithm {
             // mutation
             mutation();
 
-            //next generation: best solution's cost
+            // next generation: best solution's cost
             nextGenBestSolution = findBestSolutionDDAP(nextGeneration);
 
             if (nextGenBestSolution.getCost() < baseGenBestSolution.getCost()) {
@@ -122,9 +136,9 @@ public class EvolutionaryAlgorithm {
                 currentGenerationsWithNoImprovement++;
             }
 
-            baseGeneration.clear();
             baseGeneration = new ArrayList<>(nextGeneration);
 
+            System.out.println("Size: " + baseGeneration.size());
         }
 
         System.out.print("Population after " + currentGeneration + " generations:");
@@ -184,37 +198,49 @@ public class EvolutionaryAlgorithm {
     }
 
     private void mutation() {
-        if (Math.random() * 100 > mutationProbability) {
-            List<Integer> tmpGen = new ArrayList<>();
-            List<List<Integer>> gens = new ArrayList<>();
-            int tmpValue = 0;
-            int x = (int) Math.random() * baseGeneration.size();
-            Chromosome mutant = baseGeneration.get(x);
-            for (int i = 0; i < mutant.getGens().size(); i++) {
-                tmpGen = new ArrayList<>();
-                if (i % 2 == 0) {
-                    for (int j = 0; j < mutant.getGens().get(i).size(); j++) {
-                        if(mutant.getGens().get(i).get(j) > 0){
-                            tmpGen.add(mutant.getGens().get(i).get(j)-1);
-                            tmpValue++;
-                        }else {
-                            tmpGen.add(mutant.getGens().get(i).get(j)+tmpValue);
+
+        List<Chromosome> tmpGeneration = new ArrayList<>();
+
+        for (int k = 0; k < populationSize; k++) {
+
+            if (Math.random() * 100 > mutationProbability) {
+
+                currentMutation++;
+
+                List<Integer> tmpGen = new ArrayList<>();
+                List<List<Integer>> gens = new ArrayList<>();
+                int tmpValue = 0;
+                Chromosome mutant = nextGeneration.get(k);
+                for (int i = 0; i < mutant.getGens().size(); i++) {
+                    tmpGen = new ArrayList<>();
+                    if (i % 2 == 0) {
+                        for (int j = 0; j < mutant.getGens().get(i).size(); j++) {
+                            if(mutant.getGens().get(i).get(j) > 0){
+                                tmpGen.add(mutant.getGens().get(i).get(j)-1);
+                                tmpValue++;
+                            }else {
+                                tmpGen.add(mutant.getGens().get(i).get(j)+tmpValue);
+                                tmpValue = 0;
+                            }
+                        }
+                        if(tmpValue != 0){
+                            tmpGen.set(0,tmpValue+tmpGen.get(0));
                             tmpValue = 0;
                         }
+                    } else {
+                        tmpGen = mutant.getGens().get(i);
                     }
-                    if(tmpValue != 0){
-                        tmpGen.set(0,tmpValue+tmpGen.get(0));
-                        tmpValue = 0;
-                    }
-                } else {
-                    tmpGen = mutant.getGens().get(i);
+                    gens.add(tmpGen);
                 }
-                gens.add(tmpGen);
+                mutant.setGens(gens);
+                mutant = fitnessFunction(mutant);
+                tmpGeneration.add(mutant);
             }
-            mutant.setGens(gens);
-            mutant = fitnessFunction(mutant);
-            nextGeneration.add(mutant);
+            else {
+                tmpGeneration.add(nextGeneration.get(k));
+            }
         }
+        nextGeneration = new ArrayList<>(tmpGeneration);
     }
 
     public void generateStartPopulation() {
@@ -235,16 +261,16 @@ public class EvolutionaryAlgorithm {
                 gens.add(allCombinations.get(j).get(randomIndex));
             }
             chromosome.setGens(gens);
-            if (baseGeneration.indexOf(chromosome) == -1) {
-                baseGeneration.add(chromosome);
+            if (startPopulation.indexOf(chromosome) == -1) {
+                startPopulation.add(chromosome);
             } else {
                 chromosome = null;
             }
         }
 
-        System.out.println("Size: " + baseGeneration.size());
+        System.out.println("Size: " + startPopulation.size());
         System.out.print("Start population: ");
-        for (Chromosome c : baseGeneration) {
+        for (Chromosome c : startPopulation) {
             System.out.print(c.getGens());
         }
         System.out.println();
@@ -309,12 +335,16 @@ public class EvolutionaryAlgorithm {
     public boolean checkStopCriterion() {
 
         if (this.currentGeneration >= this.maxNumberOfGenerations) {
+            System.out.println("\nStop criterion: max number of generations\n");
             return false;
         } else if (this.currentMutation >= this.maxNumberOfMutations) {
+            System.out.println("\nStop criterion: max number of mutations\n");
             return false;
         } else if (this.currentGenerationsWithNoImprovement >= this.maxNumberOfGenerationsWithNoImprovement) {
+            System.out.println("\nStop criterion: max number of generations with no improvement\n");
             return false;
         } else if (System.currentTimeMillis() >= this.endTime) {
+            System.out.println("\nStop criterion: time limit\n");
             return false;
         } else {
             return true;

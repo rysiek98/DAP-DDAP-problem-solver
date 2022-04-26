@@ -82,9 +82,9 @@ public class Program {
         EA.computeDAP();
         EA.computeDDAP();
         
-       /* BruteForceAlgorithm BA = new BruteForceAlgorithm(network);
-        BA.computeDAP();
-        BA.computeDDAP();*/
+//        BruteForceAlgorithm BA = new BruteForceAlgorithm(network);
+//        BA.computeDAP();
+//        BA.computeDDAP();
 
     }
 }
