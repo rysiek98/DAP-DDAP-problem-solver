@@ -38,11 +38,12 @@ public class EvolutionaryAlgorithm {
         this.populationSize = 20;
         this.baseGeneration = new ArrayList<>();
         this.nextGeneration = new ArrayList<>();
-        this.maxComputationTime = 100;
-        this.maxNumberOfGenerations = 100;
-        this.maxNumberOfGenerationsWithNoImprovement = 10;
-        this.maxNumberOfMutations = 10;
-        this.numberOfCrossovers = 3;
+        this.maxComputationTime = 20;
+        this.maxNumberOfGenerations = 20;
+        this.maxNumberOfGenerationsWithNoImprovement = 19;
+        this.maxNumberOfMutations = 20;
+        this.crossoverProbability = 50;
+        this.mutationProbability = 50;
     }
 
     public EvolutionaryAlgorithm(Network network, int populationSize, float crossoverProbability,
@@ -79,22 +80,37 @@ public class EvolutionaryAlgorithm {
         endTime = System.currentTimeMillis() + maxComputationTime * 10;
 
         while (checkStopCriterion()) {
+            nextGeneration.clear();
             System.out.println(currentGeneration);
             currentGeneration++;
 
-            //maxTime w sec
-            endTime = System.currentTimeMillis() + maxComputationTime * 10;
-
-            //best solution
+            // best solution
             baseGenBestSolution = findBestSolutionDDAP(baseGeneration);
             nextGeneration.add(baseGenBestSolution);
 
-            //crossover
-            for (int i = 0; i < numberOfCrossovers; i++) {
-                crossover(i);
+            // crossover
+            int numberOfIterations;
+
+            if(populationSize % 2 == 0) { numberOfIterations = populationSize; }
+            else { numberOfIterations = populationSize - 1; }
+
+            for (int i = 0; i < numberOfIterations; i += 2) {
+
+                if (Math.random() * 100 < crossoverProbability) {
+                    crossover(baseGeneration.get(i), baseGeneration.get(i+1));
+                }
+                else {
+                    nextGeneration.add(baseGeneration.get(i));
+                    nextGeneration.add(baseGeneration.get(i+1));
+                }
             }
 
-            //mutation
+            if (nextGeneration.size() > populationSize) {
+                System.out.println("remove");
+                nextGeneration.remove(findWorstSolutionDDAP(nextGeneration));
+            }
+
+            // mutation
             mutation();
 
             //next generation: best solution's cost
@@ -106,8 +122,9 @@ public class EvolutionaryAlgorithm {
                 currentGenerationsWithNoImprovement++;
             }
 
+            baseGeneration.clear();
             baseGeneration = new ArrayList<>(nextGeneration);
-            nextGeneration.clear();
+
         }
 
         System.out.print("Population after " + currentGeneration + " generations:");
@@ -122,19 +139,25 @@ public class EvolutionaryAlgorithm {
         return nextGenBestSolution;
     }
 
-    private Chromosome findBestSolutionDDAP(List<Chromosome> baseGeneration) {
-        baseGeneration = fitnessFunction(baseGeneration);
-        baseGeneration.sort(Comparator.comparing(Chromosome::getCost));
-        return baseGeneration.get(0);
+    private Chromosome findBestSolutionDDAP(List<Chromosome> generation) {
+        generation = fitnessFunction(generation);
+        generation.sort(Comparator.comparing(Chromosome::getCost));
+        return generation.get(0);
     }
 
-    private void crossover(int round) {
-        List<List<Integer>> gensA;
-        List<List<Integer>> gensB;
+    private Chromosome findWorstSolutionDDAP(List<Chromosome> generation) {
+        generation = fitnessFunction(generation);
+        generation.sort(Comparator.comparing(Chromosome::getCost));
+        return generation.get(generation.size()-1);
+    }
+
+    private void crossover(Chromosome parentA, Chromosome parentB) {
+
+        List<List<Integer>> gensA = new ArrayList<>();
+        List<List<Integer>> gensB = new ArrayList<>();
         List<List<Integer>> childAGens = new ArrayList<>();
         List<List<Integer>> childBGens = new ArrayList<>();
-        Chromosome parentA = baseGeneration.get(round);
-        Chromosome parentB = baseGeneration.get(round + 1);
+
         int it = (int) Math.floor(parentA.getGens().size() / 2);
         gensA = parentA.getGens();
         gensB = parentB.getGens();
@@ -144,22 +167,24 @@ public class EvolutionaryAlgorithm {
             childBGens.add(gensB.get(i));
         }
 
+        Chromosome childA = null;
+        Chromosome childB = null;
+
         for (int i = it; i < gensA.size(); i++) {
             {
                 childAGens.add(gensB.get(i));
                 childBGens.add(gensA.get(i));
             }
 
-            Chromosome childA = new Chromosome(childAGens);
-            Chromosome childB = new Chromosome(childBGens);
-
-            nextGeneration.add(childA);
-            nextGeneration.add(childB);
+             childA = new Chromosome(childAGens);
+             childB = new Chromosome(childBGens);
         }
+        nextGeneration.add(childA);
+        nextGeneration.add(childB);
     }
 
     private void mutation() {
-        if (Math.random() * 100 > 10) {
+        if (Math.random() * 100 > mutationProbability) {
             List<Integer> tmpGen = new ArrayList<>();
             List<List<Integer>> gens = new ArrayList<>();
             int tmpValue = 0;
@@ -294,6 +319,5 @@ public class EvolutionaryAlgorithm {
         } else {
             return true;
         }
-
     }
 }
