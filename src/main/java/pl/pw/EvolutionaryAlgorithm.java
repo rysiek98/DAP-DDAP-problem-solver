@@ -374,9 +374,6 @@ public class EvolutionaryAlgorithm {
                 gens.add(allCombinations.get(j).get(randomIndex));
             }
             chromosome.setGens(gens);
-            if (startPopulation.indexOf(chromosome) == -1) {
-                startPopulation.add(chromosome);
-            }
         }
 
         System.out.println("Size: " + startPopulation.size());
