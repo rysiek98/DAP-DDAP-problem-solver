@@ -6,11 +6,11 @@ import java.util.List;
 
 public class Writer {
 
-    public void writeDDAP(Network network, List<List<Integer>> bestSolutions) {
+    public void write(Network network, List<List<Integer>> bestSolutions, String fileName) {
         setupNetwork(network, bestSolutions);
         try {
-            FileWriter myWriter = new FileWriter("DDAP.txt");
-            myWriter.write(printDDAPBF(network, bestSolutions));
+            FileWriter myWriter = new FileWriter(fileName + ".txt");
+            myWriter.write(print(network, bestSolutions));
             myWriter.close();
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
@@ -19,7 +19,7 @@ public class Writer {
         }
     }
 
-    private String printDDAPBF(Network network, List<List<Integer>> solution) {
+    private String print(Network network, List<List<Integer>> solution) {
         String text = network.getLinkList().size() + "\n\n";
         for (Link link : network.getLinkList()) {
             text += link.getId() + " " + link.getUsedLambdas() + " " + link.getUsedLambdas() / link.getLambdas() + "\n";

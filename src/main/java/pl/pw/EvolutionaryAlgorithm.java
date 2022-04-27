@@ -147,6 +147,8 @@ public class EvolutionaryAlgorithm {
             System.out.print("cost: " + c.getCost() + " z: " + c.getZ() + "; ");
         }
 
+        Writer writer = new Writer();
+        writer.write(network, nextGenBestSolution.getGens(), "Solution_EA_DAP");
         return nextGenBestSolution;
     }
 
@@ -229,7 +231,7 @@ public class EvolutionaryAlgorithm {
         }
 
         Writer writer = new Writer();
-        writer.writeDDAP(network, nextGenBestSolution.getGens());
+        writer.write(network, nextGenBestSolution.getGens(),"Solution_EA_DDAP");
         return nextGenBestSolution;
     }
 

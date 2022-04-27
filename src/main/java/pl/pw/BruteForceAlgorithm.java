@@ -81,6 +81,8 @@ public class BruteForceAlgorithm {
                 System.out.println(solution);
             }
             System.out.println("Minimal z: " + minZ);
+            Writer writer = new Writer();
+            writer.write(network, bestSolutions.get(0),"Solution_BF_DAP");
         }
     }
 
@@ -138,7 +140,7 @@ public class BruteForceAlgorithm {
             System.out.println("Minimal cost: " + minCost);
         }
         Writer writer = new Writer();
-        writer.writeDDAP(network, bestSolutions.get(0));
+        writer.write(network, bestSolutions.get(0),"Solution_BF_DDAP");
     }
 
     public void createAllSolutions() {
