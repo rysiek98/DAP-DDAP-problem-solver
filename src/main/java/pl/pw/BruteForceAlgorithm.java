@@ -23,7 +23,8 @@ public class BruteForceAlgorithm {
         }
     }
 
-    public void computeDAP() {
+    public long computeDAP() {
+        long executionTime = System.currentTimeMillis();
 
         if (!solutions.isEmpty()) {
             System.out.println("BRUTE FORCE DAP");
@@ -82,11 +83,13 @@ public class BruteForceAlgorithm {
             }
             System.out.println("Minimal z: " + minZ);
             Writer writer = new Writer();
-            writer.write(network, bestSolutions.get(0),"Solution_BF_DAP");
+            writer.write(network, bestSolutions.get(0), "Solution_BF_DAP");
         }
+        return System.currentTimeMillis() - executionTime;
     }
 
-    public void computeDDAP() {
+    public long computeDDAP() {
+        long executionTime = System.currentTimeMillis();
 
         List<List<List<Integer>>> bestSolutions = new ArrayList<>();
         if (!solutions.isEmpty()) {
@@ -140,7 +143,9 @@ public class BruteForceAlgorithm {
             System.out.println("Minimal cost: " + minCost);
         }
         Writer writer = new Writer();
-        writer.write(network, bestSolutions.get(0),"Solution_BF_DDAP");
+        writer.write(network, bestSolutions.get(0), "Solution_BF_DDAP");
+
+        return System.currentTimeMillis() - executionTime;
     }
 
     public void createAllSolutions() {

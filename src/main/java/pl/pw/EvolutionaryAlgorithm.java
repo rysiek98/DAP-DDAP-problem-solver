@@ -69,8 +69,9 @@ public class EvolutionaryAlgorithm {
         this.generator = new Random(seed);
     }
 
-    public Chromosome computeDAP() {
+    public long computeDAP() {
 
+        long executionTime = System.currentTimeMillis();
         Chromosome baseGenBestSolution = new Chromosome();
         Chromosome nextGenBestSolution = new Chromosome();
 
@@ -149,10 +150,12 @@ public class EvolutionaryAlgorithm {
 
         Writer writer = new Writer();
         writer.write(network, nextGenBestSolution.getGens(), "Solution_EA_DAP");
-        return nextGenBestSolution;
+
+        return System.currentTimeMillis() - executionTime;
     }
 
-    public Chromosome computeDDAP() {
+    public long computeDDAP() {
+        long executionTime = System.currentTimeMillis();
 
         Chromosome baseGenBestSolution = new Chromosome();
         Chromosome nextGenBestSolution = new Chromosome();
@@ -231,8 +234,9 @@ public class EvolutionaryAlgorithm {
         }
 
         Writer writer = new Writer();
-        writer.write(network, nextGenBestSolution.getGens(),"Solution_EA_DDAP");
-        return nextGenBestSolution;
+        writer.write(network, nextGenBestSolution.getGens(), "Solution_EA_DDAP");
+
+        return System.currentTimeMillis() - executionTime;
     }
 
     private Chromosome findBestSolutionDDAP(List<Chromosome> generation) {

@@ -25,13 +25,12 @@ public class Program {
         int numberOfGenerationWithoutImprovment = 0;
         Scanner scanner = new Scanner(System.in);
 
-        //System.out.println("Witaj! Proszę podać ścieżkę bezwzględna do pliku z grafem: ");
-        //System.out.println("Proszę wybrać plik z grafem");
-        //System.out.println("1.net4");
-        //System.out.println("2.net12_1");
-        //System.out.println("3.net12_2");
-        //pathId = scanner.nextInt();
-        /*switch (pathId) {
+        System.out.println("Witaj! Proszę wybrać plik z grafem: (domyślny plik net4)");
+        System.out.println("1.net4");
+        System.out.println("2.net12_1");
+        System.out.println("3.net12_2");
+        pathId = scanner.nextInt();
+        switch (pathId) {
             case 2: {
                 path = "src/main/resources/net12_1.txt";
             }
@@ -42,7 +41,7 @@ public class Program {
             break;
             default:
                 break;
-        }*/
+        }
         try {
             linksData = Parser.readDataLinks(path);
             demandsData = Parser.readDataDemands(path);
@@ -53,54 +52,44 @@ public class Program {
         demands = Parser.createDemands(demandsData, links);
         Network network = new Network(links, demands);
 
-        /*System.out.println("Typ problemu: DDAP - wpisz 1, DAP - wpisz 0");
+        System.out.println("Typ problemu: DDAP - wpisz 1, DAP - wpisz 0");
         problemType = scanner.nextInt();
         System.out.println("Problem ma być rozwiązany za pomocą algorytmu Ewolucyjnego: - wpisz 1 czy Brut Force - wpisz 0");
         methodType = scanner.nextInt();
         if (methodType == 1) {
-            System.out.println("Podaj wielkość populaci: (tylko liczby naturalne)");
+            System.out.println("Podaj wielkość populaci: (tylko liczby całkowite)");
             population = scanner.nextInt();
-            System.out.println("Podaj prawdopodobieństwo krzyżowania: (tylko liczby naturalne, max 100)");
+            System.out.println("Podaj prawdopodobieństwo krzyżowania: (tylko liczby całkowite, 0 do 100)");
             crossoverProbability = scanner.nextInt();
-            System.out.println("Podaj prawdopodobieństwo mutacji: (tylko liczby naturalne, max 100)");
+            System.out.println("Podaj prawdopodobieństwo mutacji: (tylko liczby całkowite, 0 do 100)");
             mutationProbability = scanner.nextInt();
-            System.out.println("Podaj liczbe generacji: (tylko liczby naturalne)");
+            System.out.println("Podaj liczbe generacji: (tylko liczby całkowite)");
             numberOfGeneration = scanner.nextInt();
-            System.out.println("Podaj liczbe mutacji: (tylko liczby naturalne)");
+            System.out.println("Podaj liczbe mutacji: (tylko liczby całkowite)");
             numberOfMutation = scanner.nextInt();
             System.out.println("Podaj czas trwania symulacji: (w sekunadach)");
             simulationTime = scanner.nextInt();
-            System.out.println("Podaj maksymalna ilość generacji nie ulepszających wyniku: (liczby naturalne)");
+            System.out.println("Podaj maksymalna ilość generacji nie ulepszających wyniku: (tylko liczby całkowite)");
             numberOfGenerationWithoutImprovment = scanner.nextInt();
-            System.out.println("Podaj ziarno: (liczba całkowita)");
+            System.out.println("Podaj ziarno: (tylko liczby całkowite)");
             seed = scanner.nextInt();
 
             EvolutionaryAlgorithm EA = new EvolutionaryAlgorithm(network, population, crossoverProbability, mutationProbability,
                     seed, numberOfGeneration, numberOfMutation, simulationTime, numberOfGenerationWithoutImprovment);
             EA.generateStartPopulation();
 
-            if(problemType == 0) {
-                EA.computeDAP();
-            }else {
-                EA.computeDDAP();
+            if (problemType == 0) {
+                System.out.println("Czas wykonania obliczeń: "+EA.computeDAP()/1000.0+"s");
+            } else {
+                System.out.println("Czas wykonania obliczeń: "+EA.computeDDAP()/1000.0+"s");
             }
         } else {
             BruteForceAlgorithm BA = new BruteForceAlgorithm(network);
-            if(problemType == 0) {
-                BA.computeDAP();
-            }else {
-                BA.computeDDAP();
+            if (problemType == 0) {
+                System.out.println("Czas wykonania obliczeń: "+BA.computeDAP()/1000.0+"s");
+            } else {
+                System.out.println("Czas wykonania obliczeń: "+BA.computeDDAP()/1000.0+"s");
             }
-        }*/
-
-        EvolutionaryAlgorithm EA = new EvolutionaryAlgorithm(network);
-        EA.generateStartPopulation();
-        //EA.computeDAP();
-        //EA.computeDDAP();
-
-        BruteForceAlgorithm BA = new BruteForceAlgorithm(network);
-        BA.computeDAP();
-        //BA.computeDDAP();
-
+        }
     }
 }
