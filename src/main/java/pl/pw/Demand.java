@@ -1,4 +1,4 @@
-package main.java.pl.pw;
+package pl.pw;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,4 +65,6 @@ public class Demand {
     {
         pathList.add(path);
     }
+
+    public int getNumberOfPaths() { return pathList.size(); }
 }

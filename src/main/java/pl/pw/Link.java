@@ -1,4 +1,4 @@
-package main.java.pl.pw;
+package pl.pw;
 
 public class Link {
 
@@ -6,8 +6,9 @@ public class Link {
     private Node startNode;
     private Node endNode;
     private int numberOfFibre;
-    private float cost;
+    private double cost;
     private int lambdas;
+    private  int usedLambdas;
 
     public Link(int id) {
         this.id = id;
@@ -45,7 +46,7 @@ public class Link {
         this.numberOfFibre = numberOfFibre;
     }
 
-    public float getCost() {
+    public double getCost() {
         return cost;
     }
 
@@ -53,11 +54,28 @@ public class Link {
         return lambdas;
     }
 
-    public void setCost(float cost) {
+    public void setCost(double cost) {
         this.cost = cost;
     }
 
     public void setLambdas(int lambdas) {
         this.lambdas = lambdas;
     }
+
+    public int getUsedLambdas() { return usedLambdas; }
+
+    public void setUsedLambdas(int usedLambdas) { this.usedLambdas = usedLambdas; }
+
+    public  void updateUsedLambdas(int usedLambdas) { this.usedLambdas = this.usedLambdas + usedLambdas; }
+
+    public double calculateCost()
+    {
+        double usedFibrePairs = Math.ceil((double) this.usedLambdas / (double) this.lambdas);
+        return usedFibrePairs * cost;
+    }
+
+    public double countCe() {
+        return lambdas * numberOfFibre;
+    }
+
 }

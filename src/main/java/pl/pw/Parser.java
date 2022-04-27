@@ -1,4 +1,4 @@
-package main.java.pl.pw;
+package pl.pw;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -77,11 +77,12 @@ public class Parser {
             links.get(id-1).setStartNode(new Node(Integer.parseInt(data.get(i))));
             links.get(id-1).setEndNode(new Node(Integer.parseInt(data.get(i + 1))));
             links.get(id-1).setNumberOfFibre(Integer.parseInt(data.get(i + 2)));
-            links.get(id-1).setCost(Float.parseFloat(data.get(i + 3)));
+            links.get(id-1).setCost(Double.parseDouble(data.get(i + 3)));
             links.get(id-1).setLambdas(Integer.parseInt(data.get(i + 4)));
             System.out.println("Created link ID: "+id+" startNode: "+links.get(id-1).getStartNode().getId()+" endNode: "+links.get(id-1).getEndNode().getId());
             ++id;
         }
+        System.out.println();
         return links;
     }
 
@@ -112,7 +113,7 @@ public class Parser {
 
                 listIter++;
                 Path path = new Path(i+1);
-                System.out.print("Created path ID: "+path.getId()+" with links:");
+                System.out.print("Created path ID: " + path.getId()+" with links:");
                 String[] splittedLine = data.get(listIter).split(" ");
                 String[] pathLinkList = Arrays.copyOfRange(splittedLine, 1, splittedLine.length);
                 for (int j = 0; j < pathLinkList.length; j++) {
@@ -123,6 +124,7 @@ public class Parser {
                 demands.get(demandId).addPath(path);
             }
         }
+        System.out.println();
         return demands;
     }
 

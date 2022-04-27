@@ -1,4 +1,4 @@
-package main.java.pl.pw;
+package pl.pw;
 
 public class Node {
     private int id;
