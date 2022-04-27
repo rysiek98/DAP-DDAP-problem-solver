@@ -12,6 +12,7 @@ public class EvolutionaryAlgorithm {
     private List<Chromosome> startPopulation;
     private List<Chromosome> baseGeneration;
     private List<Chromosome> nextGeneration;
+    private List<Chromosome> bestSolutions;
     private Random generator;
 
     // input data
@@ -41,6 +42,7 @@ public class EvolutionaryAlgorithm {
         this.startPopulation = new ArrayList<>();
         this.baseGeneration = new ArrayList<>();
         this.nextGeneration = new ArrayList<>();
+        this.bestSolutions = new ArrayList<>();
         this.maxComputationTime = 600;
         this.maxNumberOfGenerations = 10000;
         this.maxNumberOfGenerationsWithNoImprovement = 10000;
@@ -83,13 +85,14 @@ public class EvolutionaryAlgorithm {
         while (checkStopCriterion()) {
 
             nextGeneration.clear();
-            System.out.println(currentGeneration);
-            System.out.println("Base: " + baseGeneration.get(0).getGens() + " " + baseGeneration.get(1).getGens());
+           // System.out.println(currentGeneration);
+           // System.out.println("Base: " + baseGeneration.get(0).getGens() + " " + baseGeneration.get(1).getGens());
             currentGeneration++;
 
             // best solution
             baseGenBestSolution = findBestSolutionDAP(baseGeneration);
             nextGeneration.add(baseGenBestSolution);
+            bestSolutions.add(baseGenBestSolution);
 
             // crossover
             int numberOfIterations;
@@ -111,16 +114,15 @@ public class EvolutionaryAlgorithm {
             }
 
             if (nextGeneration.size() > populationSize) {
-                System.out.println("remove");
                 nextGeneration.remove(findWorstSolutionDAP(nextGeneration));
             }
 
-            System.out.println("Cross: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
+            //System.out.println("Cross: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
 
             // mutation
             mutation();
 
-            System.out.println("Mutation: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
+            //System.out.println("Mutation: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
 
             // next generation: best solution's cost
             nextGenBestSolution = findBestSolutionDDAP(nextGeneration);
@@ -134,21 +136,26 @@ public class EvolutionaryAlgorithm {
             baseGeneration.clear();
             baseGeneration = new ArrayList<>(nextGeneration);
 
-            System.out.println("Size: " + baseGeneration.size());
+            //System.out.println("Size: " + baseGeneration.size());
         }
 
-        System.out.print("Population after " + currentGeneration + " generations:");
-        for (Chromosome c : baseGeneration) {
-            System.out.print(c.getGens());
-        }
-        System.out.println();
+        bestSolutions.add(nextGenBestSolution);
+
+//        System.out.print("Population after " + currentGeneration + " generations:");
+//        for (Chromosome c : baseGeneration) {
+//            System.out.print(c.getGens());
+//        }
+//        System.out.println();
         baseGeneration = fitnessFunction(baseGeneration);
-        for (Chromosome c : baseGeneration) {
-            System.out.print("cost: " + c.getCost() + " z: " + c.getZ() + "; ");
-        }
+//        for (Chromosome c : baseGeneration) {
+//            System.out.print("cost: " + c.getCost() + " z: " + c.getZ() + "; ");
+//        }
 
         Writer writer = new Writer();
         writer.write(network, nextGenBestSolution.getGens(), "Solution_EA_DAP");
+
+        printBestSolutions(true);
+
         return nextGenBestSolution;
     }
 
@@ -166,13 +173,14 @@ public class EvolutionaryAlgorithm {
         while (checkStopCriterion()) {
 
             nextGeneration.clear();
-            System.out.println(currentGeneration);
-            System.out.println("Base: " + baseGeneration.get(0).getGens() + " " + baseGeneration.get(1).getGens());
+           // System.out.println(currentGeneration);
+           // System.out.println("Base: " + baseGeneration.get(0).getGens() + " " + baseGeneration.get(1).getGens());
             currentGeneration++;
 
             // best solution
             baseGenBestSolution = findBestSolutionDDAP(baseGeneration);
             nextGeneration.add(baseGenBestSolution);
+            bestSolutions.add(baseGenBestSolution);
 
             // crossover
             int numberOfIterations;
@@ -194,16 +202,15 @@ public class EvolutionaryAlgorithm {
             }
 
             if (nextGeneration.size() > populationSize) {
-                System.out.println("remove");
                 nextGeneration.remove(findWorstSolutionDDAP(nextGeneration));
             }
 
-            System.out.println("Cross: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
+           // System.out.println("Cross: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
 
             // mutation
             mutation();
 
-            System.out.println("Mutation: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
+           // System.out.println("Mutation: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
 
             // next generation: best solution's cost
             nextGenBestSolution = findBestSolutionDDAP(nextGeneration);
@@ -217,21 +224,26 @@ public class EvolutionaryAlgorithm {
             baseGeneration.clear();
             baseGeneration = new ArrayList<>(nextGeneration);
 
-            System.out.println("Size: " + baseGeneration.size());
+            //System.out.println("Size: " + baseGeneration.size());
         }
 
-        System.out.print("Population after " + currentGeneration + " generations:");
-        for (Chromosome c : baseGeneration) {
-            System.out.print(c.getGens());
-        }
+        bestSolutions.add(nextGenBestSolution);
+
+//        System.out.print("Population after " + currentGeneration + " generations:");
+//        for (Chromosome c : baseGeneration) {
+//            System.out.print(c.getGens());
+//        }
         System.out.println();
         baseGeneration = fitnessFunction(baseGeneration);
-        for (Chromosome c : baseGeneration) {
-            System.out.print("cost: " + c.getCost() + " z: " + c.getZ() + "; ");
-        }
+//        for (Chromosome c : baseGeneration) {
+//            System.out.print("cost: " + c.getCost() + " z: " + c.getZ() + "; ");
+//        }
 
         Writer writer = new Writer();
         writer.write(network, nextGenBestSolution.getGens(),"Solution_EA_DDAP");
+
+        printBestSolutions(false);
+
         return nextGenBestSolution;
     }
 
@@ -421,6 +433,15 @@ public class EvolutionaryAlgorithm {
             solutionZValues.clear();
         }
         return chromosomes;
+    }
+
+    public void printBestSolutions(boolean ifDAP) {
+        for(int i = 0; i < bestSolutions.size(); i++) {
+            System.out.println("Best solution in genetrion " + i);
+            if(ifDAP == true) { System.out.println( "z = " + bestSolutions.get(i).getZ()); }
+            else { System.out.println( "Cost = " + bestSolutions.get(i).getCost()); }
+            System.out.println(bestSolutions.get(i).getGens());
+        }
     }
 
     // returns true if the the algorithm should stop

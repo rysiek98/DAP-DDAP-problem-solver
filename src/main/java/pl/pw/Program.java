@@ -96,10 +96,10 @@ public class Program {
         EvolutionaryAlgorithm EA = new EvolutionaryAlgorithm(network);
         EA.generateStartPopulation();
         //EA.computeDAP();
-        //EA.computeDDAP();
+        EA.computeDDAP();
 
-        BruteForceAlgorithm BA = new BruteForceAlgorithm(network);
-        BA.computeDAP();
+        //BruteForceAlgorithm BA = new BruteForceAlgorithm(network);
+        //BA.computeDAP();
         //BA.computeDDAP();
 
     }
