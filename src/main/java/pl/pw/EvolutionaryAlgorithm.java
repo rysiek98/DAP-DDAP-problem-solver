@@ -34,24 +34,6 @@ public class EvolutionaryAlgorithm {
     private int currentMutation;
     private int currentGenerationsWithNoImprovement;
 
-/*    // constructor for development purpose only!! // TODO remove this constructor later XD (Zaloze sie że zostanie do końca xd)
-    public EvolutionaryAlgorithm(Network network) {
-        this.network = network;
-        this.seed = 34567;
-        this.populationSize = 1000;
-        this.startPopulation = new ArrayList<>();
-        this.baseGeneration = new ArrayList<>();
-        this.nextGeneration = new ArrayList<>();
-        this.bestSolutions = new ArrayList<>();
-        this.maxComputationTime = 600;
-        this.maxNumberOfGenerations = 10000;
-        this.maxNumberOfGenerationsWithNoImprovement = 10000;
-        this.maxNumberOfMutations = 10000;
-        this.crossoverProbability = 10;
-        this.mutationProbability = 5;
-        this.generator = new Random(seed);
-    }*/
-
     public EvolutionaryAlgorithm(Network network, int populationSize, float crossoverProbability,
                                  float mutationProbability, int seed, int maxNumberOfGenerations,
                                  int maxNumberOfMutations, int maxComputationTime,
@@ -91,8 +73,6 @@ public class EvolutionaryAlgorithm {
         while (checkStopCriterion()) {
 
             nextGeneration.clear();
-            // System.out.println(currentGeneration);
-            // System.out.println("Base: " + baseGeneration.get(0).getGens() + " " + baseGeneration.get(1).getGens());
             currentGeneration++;
 
             // best solution
@@ -123,15 +103,11 @@ public class EvolutionaryAlgorithm {
                 nextGeneration.remove(findWorstSolutionDAP(nextGeneration));
             }
 
-            //System.out.println("Cross: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
-
             // mutation
             mutation();
 
-            //System.out.println("Mutation: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
-
             // next generation: best solution's cost
-            nextGenBestSolution = findBestSolutionDDAP(nextGeneration);
+            nextGenBestSolution = findBestSolutionDAP(nextGeneration);
 
             if (nextGenBestSolution.getCost() < baseGenBestSolution.getCost()) {
                 currentGenerationsWithNoImprovement = 0;
@@ -141,21 +117,10 @@ public class EvolutionaryAlgorithm {
 
             baseGeneration.clear();
             baseGeneration = new ArrayList<>(nextGeneration);
-
-            //System.out.println("Size: " + baseGeneration.size());
         }
 
         bestSolutions.add(nextGenBestSolution);
         executionTime = System.currentTimeMillis() - executionTime;
-//        System.out.print("Population after " + currentGeneration + " generations:");
-//        for (Chromosome c : baseGeneration) {
-//            System.out.print(c.getGens());
-//        }
-//        System.out.println();
-//        baseGeneration = fitnessFunction(baseGeneration);
-//        for (Chromosome c : baseGeneration) {
-//            System.out.print("cost: " + c.getCost() + " z: " + c.getZ() + "; ");
-//        }
 
         Writer writer = new Writer();
         writer.write(network, nextGenBestSolution.getGens(), "Solution_EA_DAP");
@@ -180,8 +145,6 @@ public class EvolutionaryAlgorithm {
         while (checkStopCriterion()) {
 
             nextGeneration.clear();
-            // System.out.println(currentGeneration);
-            // System.out.println("Base: " + baseGeneration.get(0).getGens() + " " + baseGeneration.get(1).getGens());
             currentGeneration++;
 
             // best solution
@@ -212,12 +175,8 @@ public class EvolutionaryAlgorithm {
                 nextGeneration.remove(findWorstSolutionDDAP(nextGeneration));
             }
 
-            // System.out.println("Cross: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
-
             // mutation
             mutation();
-
-            // System.out.println("Mutation: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
 
             // next generation: best solution's cost
             nextGenBestSolution = findBestSolutionDDAP(nextGeneration);
@@ -230,21 +189,10 @@ public class EvolutionaryAlgorithm {
 
             baseGeneration.clear();
             baseGeneration = new ArrayList<>(nextGeneration);
-
-            //System.out.println("Size: " + baseGeneration.size());
         }
 
         bestSolutions.add(nextGenBestSolution);
         executionTime = System.currentTimeMillis() - executionTime;
-//        System.out.print("Population after " + currentGeneration + " generations:");
-//        for (Chromosome c : baseGeneration) {
-//            System.out.print(c.getGens());
-//        }
-//        System.out.println();
-//        baseGeneration = fitnessFunction(baseGeneration);
-//        for (Chromosome c : baseGeneration) {
-//            System.out.print("cost: " + c.getCost() + " z: " + c.getZ() + "; ");
-//        }
 
         Writer writer = new Writer();
         writer.write(network, nextGenBestSolution.getGens(), "Solution_EA_DDAP");
@@ -374,6 +322,7 @@ public class EvolutionaryAlgorithm {
                 gens.add(allCombinations.get(j).get(randomIndex));
             }
             chromosome.setGens(gens);
+            startPopulation.add(chromosome);
         }
 
         System.out.println("Size: " + startPopulation.size());
