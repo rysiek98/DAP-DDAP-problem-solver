@@ -34,7 +34,7 @@ public class EvolutionaryAlgorithm {
     private int currentMutation;
     private int currentGenerationsWithNoImprovement;
 
-    // constructor for development purpose only!! // TODO remove this constructor later XD (Zaloze sie że zostanie do końca xd)
+/*    // constructor for development purpose only!! // TODO remove this constructor later XD (Zaloze sie że zostanie do końca xd)
     public EvolutionaryAlgorithm(Network network) {
         this.network = network;
         this.seed = 34567;
@@ -50,7 +50,7 @@ public class EvolutionaryAlgorithm {
         this.crossoverProbability = 10;
         this.mutationProbability = 5;
         this.generator = new Random(seed);
-    }
+    }*/
 
     public EvolutionaryAlgorithm(Network network, int populationSize, float crossoverProbability,
                                  float mutationProbability, int seed, int maxNumberOfGenerations,
@@ -69,6 +69,11 @@ public class EvolutionaryAlgorithm {
         this.currentMutation = 0;
         this.currentGenerationsWithNoImprovement = 0;
         this.generator = new Random(seed);
+        this.startPopulation = new ArrayList<>();
+        this.baseGeneration = new ArrayList<>();
+        this.nextGeneration = new ArrayList<>();
+        this.bestSolutions = new ArrayList<>();
+        generateStartPopulation();
     }
 
     public long computeDAP() {
@@ -86,8 +91,8 @@ public class EvolutionaryAlgorithm {
         while (checkStopCriterion()) {
 
             nextGeneration.clear();
-           // System.out.println(currentGeneration);
-           // System.out.println("Base: " + baseGeneration.get(0).getGens() + " " + baseGeneration.get(1).getGens());
+            // System.out.println(currentGeneration);
+            // System.out.println("Base: " + baseGeneration.get(0).getGens() + " " + baseGeneration.get(1).getGens());
             currentGeneration++;
 
             // best solution
@@ -141,13 +146,13 @@ public class EvolutionaryAlgorithm {
         }
 
         bestSolutions.add(nextGenBestSolution);
-
+        executionTime = System.currentTimeMillis() - executionTime;
 //        System.out.print("Population after " + currentGeneration + " generations:");
 //        for (Chromosome c : baseGeneration) {
 //            System.out.print(c.getGens());
 //        }
 //        System.out.println();
-        baseGeneration = fitnessFunction(baseGeneration);
+//        baseGeneration = fitnessFunction(baseGeneration);
 //        for (Chromosome c : baseGeneration) {
 //            System.out.print("cost: " + c.getCost() + " z: " + c.getZ() + "; ");
 //        }
@@ -157,7 +162,7 @@ public class EvolutionaryAlgorithm {
 
         printBestSolutions(true);
 
-        return System.currentTimeMillis() - executionTime;
+        return executionTime;
     }
 
     public long computeDDAP() {
@@ -175,8 +180,8 @@ public class EvolutionaryAlgorithm {
         while (checkStopCriterion()) {
 
             nextGeneration.clear();
-           // System.out.println(currentGeneration);
-           // System.out.println("Base: " + baseGeneration.get(0).getGens() + " " + baseGeneration.get(1).getGens());
+            // System.out.println(currentGeneration);
+            // System.out.println("Base: " + baseGeneration.get(0).getGens() + " " + baseGeneration.get(1).getGens());
             currentGeneration++;
 
             // best solution
@@ -207,12 +212,12 @@ public class EvolutionaryAlgorithm {
                 nextGeneration.remove(findWorstSolutionDDAP(nextGeneration));
             }
 
-           // System.out.println("Cross: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
+            // System.out.println("Cross: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
 
             // mutation
             mutation();
 
-           // System.out.println("Mutation: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
+            // System.out.println("Mutation: " + nextGeneration.get(0).getGens() + " " + nextGeneration.get(1).getGens());
 
             // next generation: best solution's cost
             nextGenBestSolution = findBestSolutionDDAP(nextGeneration);
@@ -230,23 +235,23 @@ public class EvolutionaryAlgorithm {
         }
 
         bestSolutions.add(nextGenBestSolution);
-
+        executionTime = System.currentTimeMillis() - executionTime;
 //        System.out.print("Population after " + currentGeneration + " generations:");
 //        for (Chromosome c : baseGeneration) {
 //            System.out.print(c.getGens());
 //        }
-        System.out.println();
-        baseGeneration = fitnessFunction(baseGeneration);
+//        System.out.println();
+//        baseGeneration = fitnessFunction(baseGeneration);
 //        for (Chromosome c : baseGeneration) {
 //            System.out.print("cost: " + c.getCost() + " z: " + c.getZ() + "; ");
 //        }
 
         Writer writer = new Writer();
-        writer.write(network, nextGenBestSolution.getGens(),"Solution_EA_DDAP");
+        writer.write(network, nextGenBestSolution.getGens(), "Solution_EA_DDAP");
 
         printBestSolutions(false);
 
-        return System.currentTimeMillis() - executionTime;
+        return executionTime;
     }
 
     private Chromosome findBestSolutionDDAP(List<Chromosome> generation) {
@@ -438,10 +443,13 @@ public class EvolutionaryAlgorithm {
     }
 
     public void printBestSolutions(boolean ifDAP) {
-        for(int i = 0; i < bestSolutions.size(); i++) {
+        for (int i = 0; i < bestSolutions.size(); i++) {
             System.out.println("Best solution in genetrion " + i);
-            if(ifDAP == true) { System.out.println( "z = " + bestSolutions.get(i).getZ()); }
-            else { System.out.println( "Cost = " + bestSolutions.get(i).getCost()); }
+            if (ifDAP == true) {
+                System.out.println("z = " + bestSolutions.get(i).getZ());
+            } else {
+                System.out.println("Cost = " + bestSolutions.get(i).getCost());
+            }
             System.out.println(bestSolutions.get(i).getGens());
         }
     }

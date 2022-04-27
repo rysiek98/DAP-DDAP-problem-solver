@@ -72,10 +72,8 @@ public class BruteForceAlgorithm {
                     bestSolutions.clear();
                     bestSolutions.add(solution);
                 }
-
-                // TODO write solution and cost to file
             }
-
+            executionTime = System.currentTimeMillis() - executionTime;
             System.out.println("Number of best solutions: " + bestSolutions.size());
             System.out.println("List of best solutions:");
             for (List<List<Integer>> solution : bestSolutions) {
@@ -85,7 +83,7 @@ public class BruteForceAlgorithm {
             Writer writer = new Writer();
             writer.write(network, bestSolutions.get(0), "Solution_BF_DAP");
         }
-        return System.currentTimeMillis() - executionTime;
+        return executionTime;
     }
 
     public long computeDDAP() {
@@ -134,7 +132,7 @@ public class BruteForceAlgorithm {
                     bestSolutions.add(solution);
                 }
             }
-
+            executionTime = System.currentTimeMillis() - executionTime;
             System.out.println("Number of best solutions: " + bestSolutions.size());
             System.out.println("List of best solutions:");
             for (List<List<Integer>> solution : bestSolutions) {
@@ -145,7 +143,7 @@ public class BruteForceAlgorithm {
         Writer writer = new Writer();
         writer.write(network, bestSolutions.get(0), "Solution_BF_DDAP");
 
-        return System.currentTimeMillis() - executionTime;
+        return executionTime;
     }
 
     public void createAllSolutions() {

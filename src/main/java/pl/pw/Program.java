@@ -76,7 +76,6 @@ public class Program {
 
             EvolutionaryAlgorithm EA = new EvolutionaryAlgorithm(network, population, crossoverProbability, mutationProbability,
                     seed, numberOfGeneration, numberOfMutation, simulationTime, numberOfGenerationWithoutImprovment);
-            EA.generateStartPopulation();
 
             if (problemType == 0) {
                 System.out.println("Czas wykonania obliczeń: "+EA.computeDAP()/1000.0+"s");
